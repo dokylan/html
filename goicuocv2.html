@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tra Cứu Chuyển Đổi Gói Cước VNPT - Tích Hợp AI & VB312</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <!-- Markdown Parser for AI responses -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f4f8;
+        }
+        .vnpt-blue { color: #0068FF; }
+        .bg-vnpt-blue { background-color: #0068FF; }
+        .bg-vnpt-gradient { background: linear-gradient(135deg, #0068FF 0%, #004dbf 100%); }
+        .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+        
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+        
+        .tab-active {
+            background-color: #0068FF;
+            color: white;
+            font-weight: 700;
+        }
+        .tab-inactive {
+            background-color: #e5e7eb;
+            color: #4b5563;
+        }
+        .tab-inactive:hover {
+            background-color: #d1d5db;
+        }
+
+        /* Chat Widget Styles */
+        .chat-widget {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+        .chat-window {
+            width: 350px;
+            height: 500px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            margin-bottom: 15px;
+            border: 1px solid #e5e7eb;
+        }
+        .chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 15px;
+            background-color: #f9fafb;
+        }
+        .message {
+            margin-bottom: 10px;
+            max-width: 80%;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        .message.user {
+            background-color: #0068FF;
+            color: white;
+            align-self: flex-end;
+            margin-left: auto;
+            border-bottom-right-radius: 2px;
+        }
+        .message.ai {
+            background-color: #e5e7eb;
+            color: #1f2937;
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+        }
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 8px 12px;
+            background: #e5e7eb;
+            border-radius: 12px;
+            width: fit-content;
+            margin-bottom: 10px;
+        }
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            background: #6b7280;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+        
+        .message.ai strong { font-weight: 700; color: #000; }
+        .message.ai ul { list-style-type: disc; margin-left: 20px; }
+    </style>
+</head>
+<body class="p-4 md:p-6 bg-gray-100 min-h-screen">
+
+    <!-- Main Container -->
+    <div class="max-w-7xl mx-auto bg-white rounded-3xl overflow-hidden card-shadow flex flex-col min-h-[90vh]">
+        
+        <!-- Header -->
+        <div class="bg-vnpt-gradient text-white p-6 md:p-8 text-center relative flex-shrink-0">
+            <div class="absolute top-0 left-0 w-32 h-32 bg-white opacity-10 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
+            <div class="absolute bottom-0 right-0 w-48 h-48 bg-white opacity-10 rounded-full translate-x-1/3 translate-y-1/3"></div>
+
+            <h2 class="text-sm md:text-base font-light tracking-widest uppercase mb-1 opacity-90">Công cụ tra cứu & So sánh giá</h2>
+            <h1 class="text-2xl md:text-4xl font-black mb-2 uppercase leading-tight">Chuyển Đổi Gói Cước 2026</h1>
+            <p class="text-sm md:text-base opacity-90">Tra cứu thông minh, chính xác - Cập nhật dữ liệu mới nhất</p>
+        </div>
+
+        <!-- Search & Filter Section -->
+        <div class="p-4 md:p-6 bg-white sticky top-0 z-20 border-b border-gray-200 shadow-sm">
+            <!-- Search Bar -->
+            <div class="relative mb-4 max-w-3xl mx-auto">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <i class="fa-solid fa-magnifying-glass text-vnpt-blue text-xl"></i>
+                </div>
+                <input type="text" id="searchInput" 
+                    class="block w-full pl-12 pr-4 py-4 border-2 border-blue-100 rounded-full leading-5 bg-blue-50 placeholder-gray-400 focus:outline-none focus:bg-white focus:border-vnpt-blue transition duration-150 ease-in-out text-gray-900 font-bold text-lg shadow-inner" 
+                    placeholder="Nhập tên gói cước (Ví dụ: MAX, VD89, B100 6T, 12MAX...)"
+                    onkeyup="filterPackages()">
+            </div>
+
+            <!-- Category Tabs -->
+            <div class="flex flex-wrap gap-2 justify-center" id="tabsContainer">
+                <button onclick="setCategory('all')" class="category-tab tab-active px-4 py-2 rounded-full text-xs md:text-sm font-medium transition-all" data-cat="all">Tất cả</button>
+                <button onclick="setCategory('data')" class="category-tab tab-inactive px-4 py-2 rounded-full text-xs md:text-sm font-medium transition-all" data-cat="data"><i class="fa-solid fa-wifi mr-1"></i> Data</button>
+                <button onclick="setCategory('combo')" class="category-tab tab-inactive px-4 py-2 rounded-full text-xs md:text-sm font-medium transition-all" data-cat="combo"><i class="fa-solid fa-mobile-screen mr-1"></i> Combo</button>
+                <button onclick="setCategory('trasau')" class="category-tab tab-inactive px-4 py-2 rounded-full text-xs md:text-sm font-medium transition-all" data-cat="trasau"><i class="fa-solid fa-file-invoice-dollar mr-1"></i> Trả Sau</button>
+                <button onclick="setCategory('nganngay')" class="category-tab tab-inactive px-4 py-2 rounded-full text-xs md:text-sm font-medium transition-all" data-cat="nganngay"><i class="fa-solid fa-calendar-day mr-1"></i> Ngắn Ngày</button>
+                <button onclick="setCategory('chukydai')" class="category-tab tab-inactive px-4 py-2 rounded-full text-xs md:text-sm font-medium transition-all" data-cat="chukydai"><i class="fa-solid fa-sync mr-1"></i> Chu Kỳ Dài</button>
+            </div>
+        </div>
+
+        <!-- Content List -->
+        <div class="flex-grow overflow-y-auto custom-scrollbar bg-gray-50 p-4 md:p-6" style="max-height: 65vh;">
+            <div id="packagesList" class="grid gap-4 md:gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
+                <!-- Javascript will populate items here -->
+            </div>
+            
+            <!-- Empty State -->
+            <div id="noResults" class="hidden flex flex-col items-center justify-center py-12 text-center">
+                <div class="bg-gray-100 p-6 rounded-full mb-4">
+                    <i class="fa-solid fa-box-open text-gray-400 text-5xl"></i>
+                </div>
+                <h3 class="text-gray-600 font-bold text-xl mb-2">Không tìm thấy gói cước</h3>
+                <p class="text-gray-500 max-w-md">Hãy thử nhập tên gói chính xác (VD: "MAX" thay vì "gói max").</p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="bg-gray-800 text-white p-4 text-center text-xs flex-shrink-0">
+            <p class="opacity-80 font-medium">ĐIỀU HÀNH KINH DOANH</p>
+            <p class="opacity-50 mt-1">Dữ liệu tổng hợp từ các văn bản VB111, VB26, VB637 và VB312 (Quy hoạch gói Chu Kỳ Dài).</p>
+        </div>
+    </div>
+
+    <!-- AI Chat Widget -->
+    <div class="chat-widget">
+        <!-- Chat Window -->
+        <div class="chat-window" id="chatWindow">
+            <div class="bg-vnpt-blue text-white p-4 flex justify-between items-center rounded-t-xl">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-robot"></i>
+                    <span class="font-bold">Trợ lý ảo David</span>
+                </div>
+                <button onclick="toggleChat()" class="hover:bg-blue-600 rounded-full w-8 h-8 flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="message ai">
+                    Xin chào! Tôi là David - trợ lý AI của VNPT. Tôi đã được cập nhật dữ liệu mới nhất (gồm cả các gói Chu Kỳ Dài - CKD theo VB312 áp dụng từ 03/04/2026). Bạn đang cần tìm thông tin gì?
+                </div>
+            </div>
+            <div class="p-3 bg-white border-t border-gray-100">
+                <div class="flex gap-2">
+                    <input type="text" id="chatInput" class="flex-grow border border-gray-300 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-vnpt-blue" placeholder="Nhập câu hỏi..." onkeypress="handleEnter(event)">
+                    <button onclick="sendMessage()" class="bg-vnpt-blue text-white rounded-full w-10 h-10 flex items-center justify-center hover:bg-blue-700 transition shadow-sm">
+                        <i class="fa-solid fa-paper-plane text-sm"></i>
+                    </button>
+                </div>
+                <div class="text-[10px] text-gray-400 text-center mt-1">Powered by David ✨</div>
+            </div>
+        </div>
+
+        <!-- Toggle Button -->
+        <button onclick="toggleChat()" class="bg-white text-vnpt-blue p-4 rounded-full shadow-lg border-2 border-vnpt-blue hover:scale-105 transition-transform group relative">
+            <i class="fa-solid fa-comment-dots text-2xl group-hover:hidden"></i>
+            <i class="fa-solid fa-robot text-2xl hidden group-hover:inline-block"></i>
+            <span class="absolute -top-1 -right-1 flex h-3 w-3">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+            </span>
+        </button>
+    </div>
+
+    <!-- Script to handle Data and Logic -->
+    <script>
+        const packagesData = [
+            // --- DATA (Trả trước) ---
+            { old: "M10", old_price: "10k", old_ben: "200MB Data", new: "YT50G", new_price: "50k", new_ben: "2GB/30 ngày + Youtube Free", cat: "data", tag: "Thêm Tiện ích" },
+            { old: "M25", old_price: "25k", old_ben: "600MB Data", new: "VS50", new_price: "50k", new_ben: "6GB + ON Plus", cat: "data", tag: "Data gấp 10" },
+            { old: "M50", old_price: "50k", old_ben: "1.2GB Data", new: "GPM79", new_price: "79k", new_ben: "5GB + Galaxy Play", cat: "data", tag: "Data gấp 4" },
+            { old: "MAX", old_price: "70k", old_ben: "3.8GB Data", new: "DT90", new_price: "90k", new_ben: "15GB Data Tốc độ cao", cat: "data", tag: "Data gấp 3" },
+            { old: "MAX100", old_price: "100k", old_ben: "30GB (Hết hạ băng thông)", new: "BIG120", new_price: "120k", new_ben: "60GB (2GB/ngày)", cat: "data", tag: "Data gấp đôi" },
+            { old: "MAXSV", old_price: "50k", old_ben: "4GB Data", new: "THAGA70N", new_price: "70k", new_ben: "150GB (5GB/ngày) + MXH", cat: "data", tag: "Data Khủng" },
+            { old: "MAXS", old_price: "50k", old_ben: "8GB Data", new: "THAGA70N", new_price: "70k", new_ben: "150GB (5GB/ngày) + MXH", cat: "data", tag: "Data Khủng" },
+            { old: "BIG50Y", old_price: "50k", old_ben: "5GB/ngày (Zalo/Youtube)", new: "THAGA70N", new_price: "70k", new_ben: "5GB/ngày (TikTok/FB/YT)", cat: "data", tag: "Mở rộng MXH" },
+            { old: "THAGA", old_price: "50k", old_ben: "100GB/tháng", new: "THAGA70N", new_price: "70k", new_ben: "5GB/ngày (150GB/tháng)", cat: "data", tag: "Tăng Data" },
+            { old: "THAGA50", old_price: "50k", old_ben: "100GB/tháng", new: "THAGA70N", new_price: "70k", new_ben: "5GB/ngày + MXH", cat: "data", tag: "Data Khủng" },
+            { old: "THAGA60", old_price: "60k", old_ben: "2GB/ngày", new: "THAGA70N", new_price: "70k", new_ben: "5GB/ngày + MXH", cat: "data", tag: "Data gấp 2.5" },
+            { old: "ZONE50", old_price: "50k", old_ben: "3.5GB/ngày (Zone)", new: "THAGA70N", new_price: "70k", new_ben: "5GB/ngày + MXH", cat: "data", tag: "Data Toàn quốc" },
+            { old: "MAX59V", old_price: "59k", old_ben: "8GB + MyTV", new: "SPOTV80", new_price: "80k", new_ben: "1GB/ngày + SPOTV", cat: "data", tag: "Thể thao" },
+            { old: "TN59", old_price: "59k", old_ben: "2GB/ngày + MXH", new: "SPOTV80", new_price: "80k", new_ben: "1GB/ngày + SPOTV", cat: "data", tag: "Thể thao" },
+            { old: "MAX70", old_price: "70k", old_ben: "9GB Data", new: "SPOTV80", new_price: "80k", new_ben: "1GB/ngày + SPOTV", cat: "data", tag: "Thể thao" },
+            { old: "MAX79TV", old_price: "79k", old_ben: "9GB + MyTV", new: "SPOTV80", new_price: "80k", new_ben: "1GB/ngày + SPOTV", cat: "data", tag: "Thể thao" },
+            { old: "D30G", old_price: "90k", old_ben: "1GB/ngày", new: "BIG90", new_price: "90k", new_ben: "1GB/ngày (Cấu trúc mới)", cat: "data", tag: "Gói chuẩn" },
+            { old: "TD49", old_price: "49k", old_ben: "100GB/tháng", new: "THAGA70N", new_price: "70k", new_ben: "5GB/ngày (150GB/tháng)", cat: "data", tag: "Mạng Xã Hội" },
+            { old: "VC90", old_price: "90k", old_ben: "1GB/ngày + Cốc Cốc", new: "YOLO100M", new_price: "100k", new_ben: "1GB/ngày + MXH Đa nền tảng", cat: "data", tag: "Data & MXH" },
+            { old: "MAX35K", old_price: "35k", old_ben: "5GB/tháng", new: "DT70", new_price: "70k", new_ben: "10GB/tháng", cat: "data", tag: "Data gấp đôi" },
+            { old: "MAX68K", old_price: "68k", old_ben: "15GB + Zalo", new: "YOLO100M", new_price: "100k", new_ben: "1GB/ngày + MXH Đa nền tảng", cat: "data", tag: "Data & MXH" },
+            { old: "MAX69K", old_price: "69k", old_ben: "9GB + MyTV", new: "YOLO100M", new_price: "100k", new_ben: "1GB/ngày + FB/TikTok/YT", cat: "data", tag: "Data & MXH" },
+            { old: "MAX68F", old_price: "68k", old_ben: "15GB + Zalo", new: "YOLO100M", new_price: "100k", new_ben: "1GB/ngày + FB/TikTok/YT", cat: "data", tag: "Data & MXH" },
+            { old: "MAX109V", old_price: "109k", old_ben: "30GB + MyTV", new: "YOLO125V", new_price: "125k", new_ben: "7GB/ngày + MyTV", cat: "data", tag: "Data Siêu Khủng" },
+            { old: "MAXSV2", old_price: "35k", old_ben: "1.2GB/tháng", new: "VS50", new_price: "50k", new_ben: "6GB + ON Plus", cat: "data", tag: "Data gấp 5" },
+            { old: "M1", old_price: "79k", old_ben: "4GB + Zalo", new: "YOLO100M", new_price: "100k", new_ben: "1GB/ngày + FB/TikTok/YT", cat: "data", tag: "Data & MXH" },
+            { old: "M3", old_price: "79k", old_ben: "4GB + SCTV", new: "YOLO100M", new_price: "100k", new_ben: "1GB/ngày + FB/TikTok/YT", cat: "data", tag: "Data & MXH" },
+            { old: "M4", old_price: "129k", old_ben: "6GB + Game", new: "YOLO125G", new_price: "125k", new_ben: "7GB/ngày + Game", cat: "data", tag: "Siêu Data Game" },
+            { old: "M70", old_price: "70k", old_ben: "1.5GB Data", new: "DT90", new_price: "90k", new_ben: "15GB/tháng", cat: "data", tag: "Data gấp 10" },
+            { old: "M40", old_price: "40k", old_ben: "3GB Data", new: "VS50", new_price: "50k", new_ben: "6GB + ON Plus", cat: "data", tag: "Data gấp đôi" },
+            { old: "M60", old_price: "60k", old_ben: "5GB Data", new: "DT70", new_price: "70k", new_ben: "10GB/tháng", cat: "data", tag: "Data gấp đôi" },
+            { old: "BM69", old_price: "69k", old_ben: "2GB/ngày + Kaspersky", new: "THAGA70", new_price: "70k", new_ben: "3GB/ngày", cat: "data", tag: "Tăng Data" },
+            { old: "S35", old_price: "35k", old_ben: "1GB/ngày (VieON)", new: "VS50", new_price: "50k", new_ben: "6GB + ON Plus", cat: "data", tag: "Data chuẩn" },
+            { old: "S50", old_price: "50k", old_ben: "2GB/ngày", new: "THAGA70", new_price: "70k", new_ben: "3GB/ngày", cat: "data", tag: "Tăng Data" },
+            { old: "BIGHS_4GB", old_price: "35k", old_ben: "4GB Data", new: "VS50", new_price: "50k", new_ben: "6GB + ON Plus", cat: "data", tag: "Tăng Data" },
+            { old: "BUM60", old_price: "60k", old_ben: "2GB/ngày", new: "THAGA70", new_price: "70k", new_ben: "3GB/ngày", cat: "data", tag: "Tăng Data" },
+
+            // --- COMBO (Data + Thoại) ---
+            { old: "B100", old_price: "100k", old_ben: "250p nội + 250 SMS + 1.2GB/ngày", new: "VD120", new_price: "120k", new_ben: "5GB/ngày + 100p ngoại + Free Nội", cat: "combo", tag: "Data gấp 4" },
+            { old: "B129", old_price: "129k", old_ben: "Free nội <10p + 30p ngoại + 60 SMS", new: "VD149", new_price: "149k", new_ben: "6GB/ngày + Thoại (Gia hạn)", cat: "combo", tag: "Data Khủng" },
+            { old: "B30", old_price: "30k", old_ben: "100p nội + 300MB", new: "V49N", new_price: "49k", new_ben: "1000p nội + 70p ngoại", cat: "combo", tag: "Thêm Ngoại mạng" },
+            { old: "B50", old_price: "50k", old_ben: "250p nội + 600MB", new: "FCLUB", new_price: "79k", new_ben: "3GB/ngày + 1500p nội + 60p ngoại", cat: "combo", tag: "Nâng cấp toàn diện" },
+            { old: "B50SV", old_price: "50k", old_ben: "250p nội + 2GB", new: "FCLUB", new_price: "79k", new_ben: "3GB/ngày + 1500p nội + 60p ngoại", cat: "combo", tag: "Data gấp 30" },
+            { old: "B99", old_price: "99k", old_ben: "Free nội <10p + 60 SMS + 30p ngoại", new: "VD120", new_price: "120k", new_ben: "5GB/ngày + Free nội <20p + 100p ngoại", cat: "combo", tag: "Thêm Data Khủng" },
+            { old: "BK50", old_price: "50k", old_ben: "2GB/ngày + Thoại", new: "FCLUB", new_price: "79k", new_ben: "3GB/ngày + Thoại nhiều hơn", cat: "combo", tag: "Tăng Data & Thoại" },
+            { old: "BT50", old_price: "50k", old_ben: "2GB/ngày + Thoại", new: "FCLUB", new_price: "79k", new_ben: "3GB/ngày + Thoại nhiều hơn", cat: "combo", tag: "Tăng Data & Thoại" },
+            { old: "BT50P", old_price: "50k", old_ben: "2GB/ngày + Thoại", new: "FCLUB", new_price: "79k", new_ben: "3GB/ngày + Thoại nhiều hơn", cat: "combo", tag: "Tăng Data & Thoại" },
+            { old: "BUM79", old_price: "79k", old_ben: "250p nội + 2.4GB", new: "VD89P", new_price: "89k", new_ben: "4GB/ngày + Free nội <20p", cat: "combo", tag: "Data gấp 50" },
+            { old: "BXTRA", old_price: "70k", old_ben: "250p + 2GB + 100 SMS", new: "VD89P", new_price: "89k", new_ben: "4GB/ngày + Free nội <20p", cat: "combo", tag: "Thêm Data & Thoại" },
+            { old: "COMBO50", old_price: "50k", old_ben: "2GB + 250p", new: "FCLUB", new_price: "79k", new_ben: "3GB/ngày + 1500p nội", cat: "combo", tag: "Tăng Data & Thoại" },
+            { old: "VD89", old_price: "89k", old_ben: "2GB/ngày + Thoại", new: "VD120", new_price: "120k", new_ben: "5GB/ngày + Free Nội mạng", cat: "combo", tag: "Data gấp 2.5" },
+            { old: "VD149", old_price: "149k", old_ben: "6GB/ngày + Thoại", new: "FCLUB", new_price: "79k", new_ben: "3GB/ngày + 1500p nội", cat: "combo", tag: "Tiết kiệm" },
+            { old: "VD10", old_price: "1k", old_ben: "10p nội", new: "V10N", new_price: "10k/10 ngày", new_ben: "10p nội + 10MB", cat: "combo", tag: "Gói ngày" },
+            { old: "VD99PLUS", old_price: "99k", old_ben: "Thoại + 1GB/ngày", new: "VD120", new_price: "120k", new_ben: "5GB/ngày + Thoại Free", cat: "combo", tag: "Data gấp 5" },
+            { old: "VD99", old_price: "99k", old_ben: "Thoại + 1GB/ngày", new: "VD120", new_price: "120k", new_ben: "5GB/ngày + Thoại Free", cat: "combo", tag: "Data gấp 5" },
+            { old: "VD79", old_price: "79k", old_ben: "1GB/ngày + Thoại", new: "VD89P", new_price: "89k", new_ben: "4GB/ngày + Free nội <20p", cat: "combo", tag: "Data gấp 4" },
+            { old: "VD129", old_price: "129k", old_ben: "3GB/ngày + Thoại", new: "VD149", new_price: "149k", new_ben: "6GB/ngày + Thoại", cat: "combo", tag: "Data gấp đôi" },
+            { old: "D15P", old_price: "70k", old_ben: "500MB/ngày + 1000p", new: "VD89P", new_price: "89k", new_ben: "4GB/ngày + Free nội <20p", cat: "combo", tag: "Data gấp 8" },
+            { old: "D30P", old_price: "90k", old_ben: "1GB/ngày + 1500p", new: "VD120", new_price: "120k", new_ben: "5GB/ngày + Free nội <20p", cat: "combo", tag: "Data gấp 5" },
+            { old: "D49P", old_price: "49k", old_ben: "2GB/ngày + 1000p", new: "FCLUB", new_price: "79k", new_ben: "3GB/ngày + 1500p nội", cat: "combo", tag: "Tăng Data & Thoại" },
+            { old: "D50Y", old_price: "50k", old_ben: "2GB/ngày + 500p", new: "FCLUB", new_price: "79k", new_ben: "3GB/ngày + 1500p nội", cat: "combo", tag: "Tăng Data & Thoại" },
+            { old: "D60G", old_price: "100k", old_ben: "2GB/ngày + 1500p", new: "VD120", new_price: "120k", new_ben: "5GB/ngày + Free nội <20p", cat: "combo", tag: "Data gấp 2.5" },
+            { old: "D79F", old_price: "79k", old_ben: "3GB/ngày + 1500p", new: "VD89P", new_price: "89k", new_ben: "4GB/ngày + Free nội <20p", cat: "combo", tag: "Tăng Data" },
+            { old: "D89F", old_price: "89k", old_ben: "3GB/ngày + 1500p", new: "VD120", new_price: "120k", new_ben: "5GB/ngày + Free nội <20p", cat: "combo", tag: "Tăng Data" },
+            { old: "D89Y", old_price: "89k", old_ben: "3GB/ngày + 1500p", new: "VD120", new_price: "120k", new_ben: "5GB/ngày + Free nội <20p", cat: "combo", tag: "Tăng Data" },
+            { old: "D90Z", old_price: "90k", old_ben: "4GB/ngày + 1500p", new: "VD120", new_price: "120k", new_ben: "5GB/ngày + Free nội <20p", cat: "combo", tag: "Tăng Data" },
+            { old: "HOC60", old_price: "60k", old_ben: "2GB/ngày + Hocmai", new: "THAGA70N", new_price: "70k", new_ben: "5GB/ngày + MXH", cat: "combo", tag: "Giải trí thả ga" },
+            { old: "HOC90", old_price: "90k", old_ben: "4GB/ngày + Hocmai", new: "VD120", new_price: "120k", new_ben: "5GB/ngày + Thoại", cat: "combo", tag: "Thêm Thoại" },
+            { old: "FHAPPY", old_price: "49k", old_ben: "2GB/ngày + 1000p nội", new: "FCLUB", new_price: "79k", new_ben: "3GB/ngày + 1500p nội + 60p ngoại", cat: "combo", tag: "Thêm Ngoại mạng" },
+            { old: "FPT79", old_price: "79k", old_ben: "2GB + FPT Play", new: "VD89P", new_price: "89k", new_ben: "4GB/ngày + Thoại", cat: "combo", tag: "Data gấp đôi" },
+            { old: "BUM120", old_price: "120k", old_ben: "Thoại + Data", new: "VD120", new_price: "120k", new_ben: "5GB/ngày + Thoại", cat: "combo", tag: "Tối ưu ưu đãi" },
+            { old: "BUM100", old_price: "100k", old_ben: "1GB/ngày + Thoại", new: "VD120", new_price: "120k", new_ben: "5GB/ngày + Thoại", cat: "combo", tag: "Data gấp 5" },
+            { old: "BUM150", old_price: "150k", old_ben: "2GB/ngày + Thoại", new: "D169G", new_price: "169k", new_ben: "7GB/ngày + Thoại 2000p", cat: "combo", tag: "Data Siêu Khủng" },
+            { old: "HEY", old_price: "50k", old_ben: "100p nội + 10GB", new: "FCLUB", new_price: "79k", new_ben: "3GB/ngày + Thoại", cat: "combo", tag: "Tăng Data & Thoại" },
+            { old: "HEY79", old_price: "79k", old_ben: "1000p nội + Free app", new: "VD100F", new_price: "100k", new_ben: "1GB/ngày + Free MXH + Thoại", cat: "combo", tag: "Thêm Data" },
+            { old: "HEY90", old_price: "90k", old_ben: "1000p nội + 7GB", new: "VD120", new_price: "120k", new_ben: "5GB/ngày + Thoại", cat: "combo", tag: "Data Khủng" },
+            { old: "HEY125", old_price: "125k", old_ben: "10GB/30 ngày + Thoại", new: "VD150", new_price: "150k", new_ben: "2GB/ngày + Thoại", cat: "combo", tag: "Data gấp 6" },
+            { old: "HT50", old_price: "50k", old_ben: "1500p nội + 10p ngoại", new: "FCLUB", new_price: "79k", new_ben: "3GB/ngày + Thoại", cat: "combo", tag: "Thêm Data" },
+            { old: "SIEUTAM60", old_price: "60k", old_ben: "2GB/ngày", new: "FCLUB", new_price: "79k", new_ben: "3GB/ngày + Thoại", cat: "combo", tag: "Tăng Data & Thoại" },
+            { old: "VNBUM50", old_price: "50k", old_ben: "2.5GB/tháng + Thoại", new: "FCLUB", new_price: "79k", new_ben: "3GB/ngày + Thoại", cat: "combo", tag: "Data gấp 30" },
+            { old: "V20", old_price: "20k", old_ben: "20p nội", new: "V25", new_price: "25k", new_ben: "40p gọi", cat: "combo", tag: "Gấp đôi thoại" },
+            { old: "V49", old_price: "49k", old_ben: "1000p nội + 70p ngoại", new: "FCLUB", new_price: "79k", new_ben: "3GB/ngày + Thoại", cat: "combo", tag: "Thêm Data" },
+            { old: "VN50", old_price: "50k", old_ben: "1000p nội + 30p ngoại", new: "FCLUB", new_price: "79k", new_ben: "3GB/ngày + Thoại", cat: "combo", tag: "Thêm Data" },
+            { old: "SM1", old_price: "109k", old_ben: "1000p nội + 2GB", new: "VD120", new_price: "120k", new_ben: "5GB/ngày + Thoại", cat: "combo", tag: "Data gấp 75" },
+            { old: "SM3", old_price: "199k", old_ben: "1500p nội + 50GB MyTV", new: "VIP199", new_price: "199k", new_ben: "8GB/ngày + Thoại", cat: "combo", tag: "Nâng cấp VIP" },
+            { old: "SG120", old_price: "120k", old_ben: "1500p nội + 4GB/ngày", new: "VD149", new_price: "149k", new_ben: "6GB/ngày + Thoại", cat: "combo", tag: "Tăng Data" },
+            { old: "GV35", old_price: "35k", old_ben: "Thoại nội mạng", new: "V49N", new_price: "49k", new_ben: "1000p nội + 70p ngoại + 500MB", cat: "combo", tag: "Thêm Data & Ngoại mạng" },
+            { old: "GV89", old_price: "89k", old_ben: "Thoại + Data", new: "VD120", new_price: "120k", new_ben: "5GB/ngày + Thoại 1500p", cat: "combo", tag: "Tăng Data" },
+            { old: "GO109", old_price: "109k", old_ben: "2GB/ngày + Thoại", new: "VD120", new_price: "120k", new_ben: "5GB/ngày + Thoại", cat: "combo", tag: "Data gấp 2.5" },
+            { old: "BM99", old_price: "99k", old_ben: "1500p nội + 4GB/ngày", new: "BM120", new_price: "120k", new_ben: "1.5GB/ngày + Thoại + Kaspersky", cat: "combo", tag: "Bảo mật & Thoại" },
+            { old: "B69", old_price: "69k", old_ben: "1500p nội + 2.5GB", new: "VD89P", new_price: "89k", new_ben: "4GB/ngày + Thoại", cat: "combo", tag: "Data gấp 40" },
+            { old: "B70", old_price: "70k", old_ben: "Thoại nội mạng", new: "VD89P", new_price: "89k", new_ben: "4GB/ngày + Thoại", cat: "combo", tag: "Thêm Data" },
+            { old: "BIEN50K", old_price: "50k", old_ben: "1000p nội + 30p ngoại", new: "FCLUB", new_price: "79k", new_ben: "3GB/ngày + Thoại", cat: "combo", tag: "Thêm Data" },
+            { old: "BKID", old_price: "49k", old_ben: "5GB/30 ngày + Thoại", new: "FHappy", new_price: "49k", new_ben: "2GB/ngày + 1000p nội", cat: "combo", tag: "Data gấp 12" },
+            { old: "BD25", old_price: "25k", old_ben: "1000p nội", new: "V49N", new_price: "49k", new_ben: "1000p nội + 70p ngoại + 500MB", cat: "combo", tag: "Thêm Data & Ngoại mạng" },
+            { old: "BD159", old_price: "159k", old_ben: "1500p nội + 5GB/ngày", new: "D159V", new_price: "159k", new_ben: "6GB/ngày + MyTV + Thoại", cat: "combo", tag: "Tăng Data & MyTV" },
+            { old: "CCX", old_price: "69k", old_ben: "1500p nội + 1.2GB", new: "VD89P", new_price: "89k", new_ben: "4GB/ngày + Thoại", cat: "combo", tag: "Data gấp 100" },
+            { old: "CLUB", old_price: "79k", old_ben: "Thoại + Data", new: "V70PN", new_price: "70k", new_ben: "Thoại + 500MB", cat: "combo", tag: "Giá rẻ hơn" },
+            { old: "FTIN", old_price: "59k", old_ben: "Thoại + 2GB", new: "FHAPPY", new_price: "49k", new_ben: "2GB/ngày + 1000p nội", cat: "combo", tag: "Data gấp 30" },
+            { old: "FLY", old_price: "80k", old_ben: "Thoại + 3.5GB", new: "FCLUB", new_price: "79k", new_ben: "3GB/ngày + Thoại", cat: "combo", tag: "Data gấp 25" },
+            { old: "HS60", old_price: "60k", old_ben: "2GB/ngày", new: "FCLUB", new_price: "79k", new_ben: "3GB/ngày + Thoại", cat: "combo", tag: "Tăng Data & Thoại" },
+            { old: "BIVA", old_price: "60k", old_ben: "300p nội + 1GB/ngày", new: "FCLUB", new_price: "79k", new_ben: "3GB/ngày + Thoại", cat: "combo", tag: "Data gấp 3" },
+            { old: "VD450", old_price: "450k", old_ben: "4000p nội + 10GB/ngày", new: "VIP499", new_price: "499k", new_ben: "500GB/tháng + 1 Sim phụ", cat: "combo", tag: "Thêm Sim phụ" },
+
+            // Dòng FFM
+            { old: "FFMSI1", old_price: "5k", old_ben: "50 SMS nội", new: "V20N", new_price: "20k", new_ben: "Free nội <10p + 100MB", cat: "combo", tag: "Thêm Thoại & Data" },
+            { old: "FFMSI2", old_price: "8k", old_ben: "100 SMS nội", new: "V20N", new_price: "20k", new_ben: "Free nội <10p + 100MB", cat: "combo", tag: "Thêm Thoại & Data" },
+            { old: "FFMSI3", old_price: "12k", old_ben: "150 SMS nội", new: "V20N", new_price: "20k", new_ben: "Free nội <10p + 100MB", cat: "combo", tag: "Thêm Thoại & Data" },
+            { old: "FFMSI4", old_price: "16k", old_ben: "200 SMS nội", new: "V20N", new_price: "20k", new_ben: "Free nội <10p + 100MB", cat: "combo", tag: "Thêm Thoại & Data" },
+            { old: "FFMSO1", old_price: "10k", old_ben: "20 SMS ngoại", new: "V40N", new_price: "40k", new_ben: "Free nội <10p + 15p ngoại + 250MB", cat: "combo", tag: "Thêm Nội mạng" },
+            { old: "FFMSO2", old_price: "20k", old_ben: "100 SMS ngoại", new: "V40N", new_price: "40k", new_ben: "Free nội <10p + 15p ngoại + 250MB", cat: "combo", tag: "Thêm Nội mạng" },
+            { old: "FFMSO3", old_price: "28k", old_ben: "150 SMS ngoại", new: "V20N", new_price: "20k", new_ben: "Free nội <10p + 10p ngoại + 100MB", cat: "combo", tag: "Giá rẻ hơn" },
+            { old: "FFMSO4", old_price: "36k", old_ben: "200 SMS ngoại", new: "V49N", new_price: "49k", new_ben: "1000p nội + 70p ngoại", cat: "combo", tag: "Thêm Nội mạng" },
+            { old: "FFMVI1", old_price: "8k", old_ben: "20p nội", new: "V20N", new_price: "20k", new_ben: "Free nội <10p (Max 1500p) + 100MB", cat: "combo", tag: "Thoại thả ga" },
+            { old: "FFMVI2", old_price: "11k", old_ben: "30p nội", new: "V20N", new_price: "20k", new_ben: "Free nội <10p (Max 1500p) + 100MB", cat: "combo", tag: "Thoại thả ga" },
+            { old: "FFMVI3", old_price: "20k", old_ben: "50p nội", new: "V40N", new_price: "40k", new_ben: "Free nội <10p (Max 1500p) + 250MB", cat: "combo", tag: "Thoại thả ga" },
+            { old: "FFMVI4", old_price: "25k", old_ben: "100p nội", new: "V40N", new_price: "40k", new_ben: "Free nội <10p (Max 1500p) + 250MB", cat: "combo", tag: "Thoại thả ga" },
+            { old: "FFMVI5", old_price: "40k", old_ben: "200p nội", new: "V49N", new_price: "49k", new_ben: "1000p nội + 70p ngoại + 500MB", cat: "combo", tag: "Thêm Data & Ngoại mạng" },
+            { old: "FFMVO1", old_price: "16.5k", old_ben: "30p ngoại", new: "FCLUB", new_price: "79k", new_ben: "3GB/ngày + Thoại", cat: "combo", tag: "Thêm Data" },
+            { old: "FFMVO2", old_price: "27k", old_ben: "50p ngoại", new: "FCLUB", new_price: "79k", new_ben: "3GB/ngày + Thoại", cat: "combo", tag: "Thêm Data" },
+            { old: "FFMVO3", old_price: "54k", old_ben: "100p ngoại", new: "V75", new_price: "75k", new_ben: "120p thoại trong nước", cat: "combo", tag: "Tăng phút thoại" },
+            { old: "FFMVO4", old_price: "100k", old_ben: "200p ngoại", new: "VD149", new_price: "149k", new_ben: "6GB/ngày + Thoại", cat: "combo", tag: "Thêm Data Khủng" },
+
+
+            // --- TRẢ SAU (Postpaid) ---
+            { old: "ALO109", old_price: "109k", old_ben: "1000p nội + 100p ngoại", new: "VD120M", new_price: "120k", new_ben: "1GB/ngày + 1500p nội + 30p ngoại + MXH", cat: "trasau", tag: "Thêm Data & MXH" },
+            { old: "ALO21", old_price: "21k", old_ben: "700p nội + 30p ngoại", new: "V99N", new_price: "99k", new_ben: "1500p nội + 150p ngoại", cat: "trasau", tag: "Tăng phút thoại" },
+            { old: "ECO109", old_price: "109k", old_ben: "1000p nội + 100p ngoại + 100 SMS", new: "VD120M", new_price: "120k", new_ben: "1GB/ngày + 1500p nội + Free FB/TT/YT", cat: "trasau", tag: "Thêm Data & MXH" },
+            { old: "TG349", old_price: "349k", old_ben: "4000p nội + 400p ngoại + 10GB/ngày", new: "VIP349", new_price: "349k", new_ben: "4000p nội + 400p ngoại + 10GB/ngày (Giữ nguyên)", cat: "trasau", tag: "Chuyển đổi VIP" },
+            { old: "D89F", old_price: "89k", old_ben: "1500p nội + 89p ngoại + 3GB/ngày", new: "VD120", new_price: "120k", new_ben: "Free nội <20p + 100p ngoại + 5GB/ngày", cat: "trasau", tag: "Tăng Data" },
+            { old: "SANH+", old_price: "239k", old_ben: "1288p nội + 88p ngoại + 3GB", new: "VIP249", new_price: "249k", new_ben: "2000p nội + 300p ngoại + 10GB/ngày", cat: "trasau", tag: "Data cực khủng" },
+            { old: "TG499", old_price: "499k", old_ben: "4000p nội + 600p ngoại + 12GB/ngày", new: "VIP499", new_price: "499k", new_ben: "500GB/tháng + 1 Sim phụ + Thoại", cat: "trasau", tag: "Thêm Sim phụ" },
+            { old: "TP299", old_price: "299k", old_ben: "1000p nội + 100p ngoại + 5GB/tháng", new: "VIP349", new_price: "349k", new_ben: "4000p nội + 400p ngoại + 10GB/ngày", cat: "trasau", tag: "Nâng cấp toàn diện" },
+            { old: "ALO31_BGG", old_price: "80k", old_ben: "700p nội + 30p ngoại", new: "V99N", new_price: "99k", new_ben: "1500p nội + 150p ngoại", cat: "trasau", tag: "Tăng phút thoại" },
+            { old: "ALO51_BGG", old_price: "100k", old_ben: "700p nội + 30p ngoại + MAX", new: "VD120M", new_price: "120k", new_ben: "1GB/ngày + MXH + Thoại", cat: "trasau", tag: "Tăng Data & MXH" },
+            { old: "ALO66_BGG", old_price: "115k", old_ben: "1500p nội + 7GB/tháng", new: "VD120M", new_price: "120k", new_ben: "1GB/ngày + MXH + Thoại", cat: "trasau", tag: "Data gấp 4" },
+            { old: "ALO70_LSN", old_price: "70k", old_ben: "1000p nội + 600p ngoại", new: "VD90", new_price: "90k", new_ben: "1GB/ngày + 1500p nội", cat: "trasau", tag: "Thêm Data" },
+            { old: "ALO70_BKN", old_price: "70k", old_ben: "1500p nội", new: "V99N", new_price: "99k", new_ben: "1500p nội + 150p ngoại", cat: "trasau", tag: "Thêm Ngoại mạng" },
+            { old: "ALO79", old_price: "79k", old_ben: "1000p nội + 70p ngoại", new: "V99N", new_price: "99k", new_ben: "1500p nội + 150p ngoại", cat: "trasau", tag: "Tăng phút thoại" },
+            { old: "ALO89_HYN", old_price: "89k", old_ben: "500p nội + 50p ngoại", new: "VD120M", new_price: "120k", new_ben: "1GB/ngày + MXH + Thoại", cat: "trasau", tag: "Thêm Data & MXH" },
+            { old: "ALO90_LSN", old_price: "90k", old_ben: "700p nội + 30p ngoại + MAX", new: "VD120M", new_price: "120k", new_ben: "1GB/ngày + MXH + Thoại", cat: "trasau", tag: "Tăng Data & MXH" },
+            { old: "ALO109_1", old_price: "109k", old_ben: "3000p nội + 1GB/tháng", new: "VD120M", new_price: "120k", new_ben: "1GB/ngày + MXH + Thoại", cat: "trasau", tag: "Data gấp 30" },
+            { old: "ALO109_2", old_price: "109k", old_ben: "500p nội + 50p ngoại + 1GB", new: "VD120M", new_price: "120k", new_ben: "1GB/ngày + MXH + Thoại", cat: "trasau", tag: "Data gấp 30" },
+            { old: "ALO119_BKN", old_price: "119k", old_ben: "1000p nội + 100p ngoại + MAX", new: "VD120M", new_price: "120k", new_ben: "1GB/ngày + MXH + Thoại", cat: "trasau", tag: "Tăng Data & MXH" },
+            { old: "ALOGVI", old_price: "115k", old_ben: "500p nội + 30p ngoại", new: "D159V", new_price: "159k", new_ben: "6GB/ngày + MyTV + Thoại", cat: "trasau", tag: "Data Siêu Khủng" },
+            { old: "BIENDAO", old_price: "99k", old_ben: "1000p nội + 6GB/tháng", new: "V99N", new_price: "99k", new_ben: "1500p nội + 150p ngoại + 1GB", cat: "trasau", tag: "Thêm Ngoại mạng" },
+            { old: "ECO109_DLC", old_price: "109k", old_ben: "1000p nội + 100p ngoại", new: "VD120M", new_price: "120k", new_ben: "1GB/ngày + MXH + Thoại", cat: "trasau", tag: "Thêm Data & MXH" },
+            { old: "ECO109_BDH", old_price: "109k", old_ben: "1000p nội + 100p ngoại", new: "VD120M", new_price: "120k", new_ben: "1GB/ngày + MXH + Thoại", cat: "trasau", tag: "Thêm Data & MXH" },
+            { old: "FPLUS", old_price: "30k", old_ben: "500p nội + 30p ngoại + 1GB", new: "VD90", new_price: "90k", new_ben: "1GB/ngày + 1500p nội", cat: "trasau", tag: "Data gấp 30" },
+            { old: "FCPLUS", old_price: "14.2k", old_ben: "500p nội + 30p ngoại + 1GB", new: "V99N", new_price: "99k", new_ben: "1500p nội + 150p ngoại", cat: "trasau", tag: "Tăng phút thoại" },
+            { old: "FCVIP", old_price: "174k", old_ben: "4000p nội + 300p ngoại + 9GB", new: "VIP199", new_price: "199k", new_ben: "2000p nội + 250p ngoại + 8GB/ngày", cat: "trasau", tag: "Data gấp 25" },
+            { old: "FVIP", old_price: "230k", old_ben: "4000p nội + 300p ngoại + 9GB", new: "VIP249", new_price: "249k", new_ben: "2000p nội + 300p ngoại + 10GB/ngày", cat: "trasau", tag: "Data gấp 30" },
+            { old: "SANG+", old_price: "1.439k", old_ben: "2888p nội + 888p ngoại", new: "VIPPLUS", new_price: "1.499k", new_ben: "6000p nội + 1500p ngoại + 1500GB", cat: "trasau", tag: "Gói Siêu VIP" },
+            { old: "SPEED79", old_price: "79k", old_ben: "30p nội + 2GB/tháng", new: "VD120M", new_price: "120k", new_ben: "1GB/ngày + MXH + Thoại", cat: "trasau", tag: "Data gấp 15" },
+            { old: "SPEED299", old_price: "299k", old_ben: "1500p nội + 50p ngoại", new: "VIP349", new_price: "349k", new_ben: "4000p nội + 400p ngoại + 10GB/ngày", cat: "trasau", tag: "Data Siêu Khủng" },
+            { old: "TALK21", old_price: "21k", old_ben: "500p nội + 10p ngoại", new: "V99N", new_price: "99k", new_ben: "1500p nội + 150p ngoại", cat: "trasau", tag: "Tăng phút thoại" },
+            { old: "TALK45", old_price: "45k", old_ben: "700p nội", new: "V99N", new_price: "99k", new_ben: "1500p nội + 150p ngoại", cat: "trasau", tag: "Tăng phút thoại" },
+            { old: "TG595", old_price: "595k", old_ben: "4000p nội + 600p ngoại + 40GB", new: "VIP599", new_price: "599k", new_ben: "4000p nội + 700p ngoại + 500GB/tháng", cat: "trasau", tag: "Data gấp 12" },
+            { old: "TG695", old_price: "695k", old_ben: "5000p nội + 700p ngoại + 45GB", new: "VIP699", new_price: "699k", new_ben: "5000p nội + 800p ngoại + 700GB/tháng", cat: "trasau", tag: "Data gấp 15" },
+            { old: "TG795", old_price: "795k", old_ben: "5000p nội + 800p ngoại + 50GB", new: "VIP899", new_price: "899k", new_ben: "6000p nội + 1000p ngoại + 900GB/tháng", cat: "trasau", tag: "Data gấp 18" },
+            { old: "TG799", old_price: "799k", old_ben: "5000p nội + 900p ngoại + 9GB/ngày", new: "VIP899", new_price: "899k", new_ben: "6000p nội + 1000p ngoại + 900GB/tháng", cat: "trasau", tag: "Thêm Data" },
+            { old: "TP549", old_price: "549k", old_ben: "3000p nội + 300p ngoại + 20GB", new: "VIP599", new_price: "599k", new_ben: "4000p nội + 700p ngoại + 500GB/tháng", cat: "trasau", tag: "Data gấp 25" },
+            { old: "TP649", old_price: "649k", old_ben: "3000p nội + 300p ngoại + 1GB/ngày", new: "VIP699", new_price: "699k", new_ben: "5000p nội + 800p ngoại + 700GB/tháng", cat: "trasau", tag: "Data gấp 23" },
+            { old: "TP849", old_price: "849k", old_ben: "4000p nội + 500p ngoại + 3GB/ngày", new: "VIP899", new_price: "899k", new_ben: "6000p nội + 1000p ngoại + 900GB/tháng", cat: "trasau", tag: "Data gấp 10" },
+            { old: "VD299", old_price: "299k", old_ben: "500p nội + 100p ngoại + 5GB", new: "VIP349", new_price: "349k", new_ben: "4000p nội + 400p ngoại + 10GB/ngày", cat: "trasau", tag: "Data Siêu Khủng" },
+            { old: "VINA70", old_price: "70k", old_ben: "70k gọi nội mạng + 1.6GB", new: "VD90", new_price: "90k", new_ben: "1GB/ngày + 1500p nội", cat: "trasau", tag: "Data gấp 20" },
+            { old: "VINA118", old_price: "118k", old_ben: "118k gọi nội mạng + 1.6GB", new: "D159V", new_price: "159k", new_ben: "6GB/ngày + MyTV + Thoại", cat: "trasau", tag: "Data Siêu Khủng" },
+            { old: "D99VT", old_price: "99k", old_ben: "1500p nội + 50p ngoại + 1GB/ngày", new: "VD120", new_price: "120k", new_ben: "5GB/ngày + Thoại", cat: "trasau", tag: "Data gấp 5" },
+            { old: "D99KPLUS", old_price: "99k", old_ben: "1000p nội + 500MB/ngày + K+", new: "VD120", new_price: "120k", new_ben: "5GB/ngày + Thoại", cat: "trasau", tag: "Data gấp 10" },
+
+             // --- NGẮN NGÀY ---
+            { old: "VC5", old_price: "5k", old_ben: "1GB/24h + Cốc Cốc", new: "D6V", new_price: "6k", new_ben: "2GB/24h + MyTV", cat: "nganngay", tag: "Data gấp đôi" },
+            { old: "FFDD1", old_price: "3k", old_ben: "500MB/24h", new: "MI_D6V", new_price: "6k", new_ben: "2GB/24h + MyTV", cat: "nganngay", tag: "Data gấp 4" },
+            { old: "FFDD2", old_price: "5k", old_ben: "1GB/24h", new: "MI_D6V", new_price: "6k", new_ben: "2GB/24h + MyTV", cat: "nganngay", tag: "Data gấp đôi" },
+            { old: "FFDD3", old_price: "10k", old_ben: "2GB/24h", new: "MI_D2", new_price: "10k", new_ben: "2GB/24h", cat: "nganngay", tag: "Giữ nguyên" },
+            { old: "FFDD4", old_price: "20k", old_ben: "4GB/24h", new: "MI_D20", new_price: "20k", new_ben: "4GB/24h", cat: "nganngay", tag: "Giữ nguyên" },
+            { old: "FFMD1", old_price: "8k", old_ben: "500MB/24h (15 ngày)", new: "YOLO35", new_price: "35k", new_ben: "1GB/ngày (15 ngày)", cat: "nganngay", tag: "Data gấp đôi" },
+            { old: "FFMD2", old_price: "16k", old_ben: "1GB/24h (15 ngày)", new: "YOLO35", new_price: "35k", new_ben: "1GB/ngày (15 ngày)", cat: "nganngay", tag: "Giữ nguyên" },
+            { old: "FFMD3", old_price: "25k", old_ben: "1.6GB/24h (15 ngày)", new: "YOLO35", new_price: "35k", new_ben: "1GB/ngày (15 ngày)", cat: "nganngay", tag: "Tối ưu giá" },
+
+            // --- CHU KỲ DÀI (CKD) Bổ sung từ VB312 ---
+            { old: "B100 (3T/6T/12T)", old_price: "250k - 1tr", old_ben: "Gói B100 chu kỳ dài", new: "VD120 (3T/7T/14T)", new_price: "360k - 1.44tr", new_ben: "Chu kỳ dài VD120 tương ứng", cat: "chukydai", tag: "Tối ưu CKD" },
+            { old: "B129 (3T/6T/12T)", old_price: "322k - 1.29tr", old_ben: "Gói B129 chu kỳ dài", new: "VD149 (3T/6T/12T)", new_price: "372k - 1.49tr", new_ben: "Chu kỳ dài VD149 tương ứng", cat: "chukydai", tag: "Dịch chuyển CKD" },
+            { old: "B30 (3T/6T/12T)", old_price: "75k - 300k", old_ben: "Gói B30 chu kỳ dài", new: "V49N (3T/7T/14T)", new_price: "147k - 588k", new_ben: "Chu kỳ dài V49N tương ứng", cat: "chukydai", tag: "Tối ưu CKD" },
+            { old: "B50/B50SV (3T/6T/12T)", old_price: "125k - 500k", old_ben: "Gói B50 chu kỳ dài", new: "FCLUB (3T/6T/12T)", new_price: "190k - 790k", new_ben: "Chu kỳ dài FCLUB tương ứng", cat: "chukydai", tag: "Dịch chuyển CKD" },
+            { old: "B99 (3T/6T/12T)", old_price: "247k - 990k", old_ben: "Gói B99 chu kỳ dài", new: "VD120 (3T/7T/14T)", new_price: "360k - 1.44tr", new_ben: "Chu kỳ dài VD120 tương ứng", cat: "chukydai", tag: "Tối ưu CKD" },
+            { old: "BM99 (7T/14T)", old_price: "594k - 1.18tr", old_ben: "Gói BM99 chu kỳ dài", new: "BM120 (6T/12T)", new_price: "720k - 1.44tr", new_ben: "Chu kỳ dài BM120 tương ứng", cat: "chukydai", tag: "Dịch chuyển CKD" },
+            { old: "BUM100 (3T/6T/12T)", old_price: "300k - 1.2tr", old_ben: "Gói BUM100 chu kỳ dài", new: "VD120 (3T/7T/14T)", new_price: "360k - 1.44tr", new_ben: "Chu kỳ dài VD120 tương ứng", cat: "chukydai", tag: "Tối ưu CKD" },
+            { old: "BUM150 (3T/7T/14T)", old_price: "450k - 1.8tr", old_ben: "Gói BUM150 chu kỳ dài", new: "D169G (3T/6T/12T)", new_price: "507k - 1.69tr", new_ben: "Chu kỳ dài D169G tương ứng", cat: "chukydai", tag: "Dịch chuyển CKD" },
+            { old: "D30P (3T/6T/12T)", old_price: "270k - 900k", old_ben: "Gói D30P chu kỳ dài", new: "VD120 (3T/7T/14T)", new_price: "360k - 1.44tr", new_ben: "Chu kỳ dài VD120 tương ứng", cat: "chukydai", tag: "Tối ưu CKD" },
+            { old: "D49P/D50P (3T/6T/12T)", old_price: "147k - 600k", old_ben: "Gói D49P/D50P chu kỳ dài", new: "FCLUB (3T/6T/12T)", new_price: "190k - 790k", new_ben: "Chu kỳ dài FCLUB tương ứng", cat: "chukydai", tag: "Dịch chuyển CKD" },
+            { old: "D89F/D89K (3T/6T/12T)", old_price: "267k - 1.06tr", old_ben: "Gói D89 chu kỳ dài", new: "VD120 (3T/7T/14T)", new_price: "360k - 1.44tr", new_ben: "Chu kỳ dài VD120 tương ứng", cat: "chukydai", tag: "Tối ưu CKD" },
+            { old: "VD89 (3T/6T/12T)", old_price: "222k - 890k", old_ben: "Gói VD89 chu kỳ dài", new: "VD120 (3T/7T/14T)", new_price: "360k - 1.44tr", new_ben: "Chu kỳ dài VD120 tương ứng", cat: "chukydai", tag: "Tối ưu CKD" },
+            { old: "MAX (6T/12T)", old_price: "350k - 700k", old_ben: "Gói MAX chu kỳ dài", new: "DT90 (6T/12T)", new_price: "540k - 1.08tr", new_ben: "Chu kỳ dài DT90 tương ứng", cat: "chukydai", tag: "Dịch chuyển CKD" },
+            { old: "MAX109V (3T/6T/12T)", old_price: "327k - 1.3tr", old_ben: "Gói MAX109V chu kỳ dài", new: "YOLO125V (3T/6T/12T)", new_price: "375k - 1.5tr", new_ben: "Chu kỳ dài YOLO125V", cat: "chukydai", tag: "Dịch chuyển CKD" },
+            { old: "THAGA60 (3T/6T/12T)", old_price: "180k - 720k", old_ben: "Gói THAGA60 chu kỳ dài", new: "THAGA70N (3T/6T/12T)", new_price: "210k - 840k", new_ben: "Chu kỳ dài THAGA70N", cat: "chukydai", tag: "Dịch chuyển CKD" }
+        ];
+
+        let currentCategory = 'all';
+
+        // --- Render Logic ---
+        function renderPackages(data) {
+            const list = document.getElementById('packagesList');
+            const noResults = document.getElementById('noResults');
+            
+            list.innerHTML = '';
+            
+            if (data.length === 0) {
+                noResults.classList.remove('hidden');
+            } else {
+                noResults.classList.add('hidden');
+                data.forEach(pkg => {
+                    let catLabel = '';
+                    let catColorClass = '';
+                    switch(pkg.cat) {
+                        case 'data': catLabel = 'Data'; catColorClass = 'text-blue-600 bg-blue-100'; break;
+                        case 'combo': catLabel = 'Combo'; catColorClass = 'text-green-600 bg-green-100'; break;
+                        case 'trasau': catLabel = 'Trả Sau'; catColorClass = 'text-orange-600 bg-orange-100'; break;
+                        case 'nganngay': catLabel = 'Ngắn ngày'; catColorClass = 'text-purple-600 bg-purple-100'; break;
+                        case 'chukydai': catLabel = 'Chu Kỳ Dài'; catColorClass = 'text-teal-600 bg-teal-100'; break;
+                    }
+
+                    const card = `
+                        <div class="flex flex-col rounded-2xl overflow-hidden card-shadow bg-white hover:-translate-y-1 transition-transform duration-300">
+                            <!-- Top: Old Package -->
+                            <div class="bg-gray-100 p-4 border-b border-gray-200 relative">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <div class="text-xs font-bold text-gray-500 uppercase mb-1">Gói cước cũ</div>
+                                        <div class="flex items-baseline gap-2">
+                                            <div class="text-xl font-bold text-gray-700">${pkg.old}</div>
+                                            <span class="text-sm font-medium text-gray-500 bg-gray-200 px-2 py-0.5 rounded-full whitespace-nowrap">${pkg.old_price}</span>
+                                        </div>
+                                        <div class="text-xs text-gray-500 mt-1 line-clamp-2"><i class="fa-regular fa-clock mr-1"></i>${pkg.old_ben}</div>
+                                    </div>
+                                    <span class="text-[10px] font-bold px-2 py-1 rounded uppercase ${catColorClass} text-center min-w-[70px]">${catLabel}</span>
+                                </div>
+                                <div class="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-8 h-8 bg-white rounded-full flex items-center justify-center border border-gray-200 shadow-sm z-10">
+                                    <i class="fa-solid fa-arrow-down text-vnpt-blue text-sm"></i>
+                                </div>
+                            </div>
+
+                            <!-- Bottom: New Package -->
+                            <div class="p-4 pt-6 bg-white flex-grow flex flex-col justify-between">
+                                <div>
+                                    <div class="flex justify-between items-baseline mb-1">
+                                        <div class="text-xs font-bold text-vnpt-blue uppercase">Gói mới thay thế</div>
+                                        <div class="text-sm font-bold text-red-500 whitespace-nowrap">${pkg.new_price}</div>
+                                    </div>
+                                    <div class="text-2xl font-black text-vnpt-blue mb-2">${pkg.new}</div>
+                                    <div class="bg-blue-50 p-2 rounded-lg border border-blue-100 mb-3">
+                                        <div class="text-sm text-gray-800 font-medium"><i class="fa-solid fa-gift text-yellow-500 mr-2"></i>${pkg.new_ben}</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex justify-between items-center mt-2 pt-3 border-t border-gray-100">
+                                    <span class="inline-block bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">
+                                        <i class="fa-solid fa-star mr-1 text-yellow-300"></i> ${pkg.tag}
+                                    </span>
+                                    <button onclick="analyzePackage('${pkg.old}', '${pkg.new}')" class="text-xs font-bold text-vnpt-blue hover:underline flex items-center">
+                                        <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Phân tích
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    list.innerHTML += card;
+                });
+            }
+        }
+
+        function filterPackages() {
+            const query = document.getElementById('searchInput').value.toUpperCase().trim();
+            const filtered = packagesData.filter(pkg => {
+                const matchesSearch = pkg.old.toUpperCase().includes(query) || pkg.new.toUpperCase().includes(query);
+                const matchesCat = currentCategory === 'all' || pkg.cat === currentCategory;
+                return matchesSearch && matchesCat;
+            });
+            renderPackages(filtered);
+        }
+
+        function setCategory(cat) {
+            currentCategory = cat;
+            document.querySelectorAll('.category-tab').forEach(btn => {
+                if (btn.dataset.cat === cat) {
+                    btn.classList.add('tab-active');
+                    btn.classList.remove('tab-inactive');
+                } else {
+                    btn.classList.remove('tab-active');
+                    btn.classList.add('tab-inactive');
+                }
+            });
+            filterPackages();
+        }
+
+        // --- GEMINI AI INTEGRATION ---
+        
+        const apiKey = ""; // Set environment key here if running locally
+        const systemPrompt = `Bạn là David - Trợ lý AI chuyên nghiệp của VNPT VinaPhone. 
+        Nhiệm vụ của bạn là tư vấn cho khách hàng về việc chuyển đổi gói cước dựa trên dữ liệu sau: ${JSON.stringify(packagesData)}.
+        
+        Quy tắc trả lời:
+        1. Luôn trả lời bằng Tiếng Việt thân thiện, lịch sự và xưng là "David".
+        2. Chú ý cập nhật mới nhất từ VB312: Việc chuyển đổi gói cước chu kỳ dài (CKD) sẽ bắt đầu từ 03/04/2026. Gói CKD cũ (3T, 6T, 12T) sẽ được tự động map sang chu kỳ tương ứng của gói mới (ví dụ gói cũ 12T map sang gói 14T nếu gói mới thiết kế vậy).
+        3. Nếu khách hàng hỏi về gói cước cụ thể, hãy cung cấp thông tin chi tiết của gói cũ và gói mới tương ứng.
+        4. Sử dụng định dạng Markdown (in đậm **text**, danh sách - item) để câu trả lời dễ đọc.
+        5. Ngắn gọn, súc tích, đi thẳng vào vấn đề.`;
+
+        async function callGeminiAPI(userMessage) {
+            if (!userMessage) return;
+
+            // Show user message
+            addMessage(userMessage, 'user');
+            
+            // Show typing indicator
+            const typingId = showTyping();
+
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ 
+                            role: "user", 
+                            parts: [{ text: userMessage }] 
+                        }],
+                        systemInstruction: {
+                            parts: [{ text: systemPrompt }]
+                        }
+                    })
+                });
+
+                const data = await response.json();
+                removeTyping(typingId);
+
+                if (data.error) {
+                    addMessage("Xin lỗi, hệ thống đang bận. Vui lòng thử lại sau.", 'ai');
+                    console.error(data.error);
+                } else {
+                    const aiText = data.candidates[0].content.parts[0].text;
+                    addMessage(aiText, 'ai');
+                }
+            } catch (error) {
+                removeTyping(typingId);
+                addMessage("Đã có lỗi xảy ra. Vui lòng kiểm tra kết nối mạng.", 'ai');
+            }
+        }
+
+        // --- Chat Widget Functions ---
+
+        function toggleChat() {
+            const chatWindow = document.getElementById('chatWindow');
+            if (chatWindow.style.display === 'flex') {
+                chatWindow.style.display = 'none';
+            } else {
+                chatWindow.style.display = 'flex';
+                document.getElementById('chatInput').focus();
+            }
+        }
+
+        function handleEnter(e) {
+            if (e.key === 'Enter') sendMessage();
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (text) {
+                callGeminiAPI(text);
+                input.value = '';
+            }
+        }
+
+        function addMessage(text, sender) {
+            const container = document.getElementById('chatMessages');
+            const div = document.createElement('div');
+            div.className = `message ${sender}`;
+            
+            // Use marked library to parse markdown safely
+            if (sender === 'ai') {
+                div.innerHTML = marked.parse(text);
+            } else {
+                div.textContent = text;
+            }
+            
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function showTyping() {
+            const container = document.getElementById('chatMessages');
+            const id = 'typing-' + Date.now();
+            const div = document.createElement('div');
+            div.id = id;
+            div.className = 'typing-indicator';
+            div.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+            return id;
+        }
+
+        function removeTyping(id) {
+            const el = document.getElementById(id);
+            if (el) el.remove();
+        }
+
+        // Feature: Analyze specific package
+        function analyzePackage(oldPkg, newPkg) {
+            toggleChat(); // Open chat window
+            const prompt = `So sánh ngắn gọn gói cũ ${oldPkg} và gói mới ${newPkg}. Tại sao tôi nên đổi? Nêu ưu điểm vượt trội.`;
+            callGeminiAPI(prompt); 
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            renderPackages(packagesData);
+        });
+
+    </script>
+</body>
+</html>
