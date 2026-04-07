@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tra Cứu Chuyển Đổi Gói Cước VNPT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+	<script src="https://unpkg.com/pptxgenjs/dist/pptxgen.bundle.js"></script>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f4f8;
+        }
+        .vnpt-blue { color: #0068FF; }
+        .bg-vnpt-blue { background-color: #0068FF; }
+        .bg-vnpt-gradient { background: linear-gradient(135deg, #0068FF 0%, #004dbf 100%); }
+        .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+        
+        /* Custom Scrollbar for table */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+        
+        .tab-active {
+            background-color: #0068FF;
+            color: white;
+            font-weight: 700;
+        }
+        .tab-inactive {
+            background-color: #f3f4f6;
+            color: #4b5563;
+        }
+    </style>
+
+
+</head>
+<body class="p-4 md:p-6 bg-gray-100 min-h-screen">
+
+    <!-- Main Container -->
+    <div class="max-w-5xl mx-auto bg-white rounded-3xl overflow-hidden card-shadow flex flex-col min-h-[90vh]">
+        
+        <!-- Header -->
+        <div class="bg-vnpt-gradient text-white p-6 md:p-8 text-center relative flex-shrink-0">
+            <div class="absolute top-0 left-0 w-32 h-32 bg-white opacity-10 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
+            <div class="absolute bottom-0 right-0 w-48 h-48 bg-white opacity-10 rounded-full translate-x-1/3 translate-y-1/3"></div>
+
+            <h2 class="text-sm md:text-base font-light tracking-widest uppercase mb-1 opacity-90">Công cụ tra cứu</h2>
+            <h1 class="text-2xl md:text-4xl font-black mb-2 uppercase leading-tight">Chuyển Đổi Gói Cước 2026</h1>
+            <p class="text-sm md:text-base opacity-90">Nhập tên gói cước cũ để tìm gói cước mới tương ứng</p>
+			
+        </div>
+		<div class="mt-4">
+    <button onclick="exportPPT()" 
+    class="bg-white text-blue-600 font-bold px-6 py-2 rounded-xl shadow hover:scale-105 transition">
+        Xuất PowerPoint
+    </button>
+</div>
+
+
+        <!-- Search & Filter Section -->
+        <div class="p-4 md:p-6 bg-white sticky top-0 z-10 border-b border-gray-200">
+            <!-- Search Bar -->
+            <div class="relative mb-6">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i class="fa-solid fa-search text-gray-400 text-lg"></i>
+                </div>
+                <input type="text" id="searchInput" 
+                    class="block w-full pl-10 pr-4 py-3 border-2 border-blue-100 rounded-xl leading-5 bg-blue-50 placeholder-gray-500 focus:outline-none focus:bg-white focus:border-vnpt-blue transition duration-150 ease-in-out text-gray-900 font-medium text-lg shadow-sm" 
+                    placeholder="Gõ tên gói cước cũ của bạn (Ví dụ: MAX, VD89, ALO109...)"
+                    onkeyup="filterPackages()">
+            </div>
+
+            <!-- Category Tabs -->
+            <div class="flex flex-wrap gap-2 justify-center md:justify-start" id="tabsContainer">
+                <button onclick="setCategory('all')" class="category-tab tab-active px-4 py-2 rounded-full text-sm transition-all shadow-sm" data-cat="all">Tất cả</button>
+                <button onclick="setCategory('data')" class="category-tab tab-inactive px-4 py-2 rounded-full text-sm transition-all shadow-sm" data-cat="data">Gói Data</button>
+                <button onclick="setCategory('combo')" class="category-tab tab-inactive px-4 py-2 rounded-full text-sm transition-all shadow-sm" data-cat="combo">Gói Combo</button>
+                <button onclick="setCategory('trasau')" class="category-tab tab-inactive px-4 py-2 rounded-full text-sm transition-all shadow-sm" data-cat="trasau">Trả Sau</button>
+                <button onclick="setCategory('trasau312')" class="category-tab tab-inactive px-4 py-2 rounded-full text-sm transition-all shadow-sm" data-cat="trasau312">Trả sau</button>
+                <button onclick="setCategory('ckd312')" class="category-tab tab-inactive px-4 py-2 rounded-full text-sm transition-all shadow-sm" data-cat="ckd312">Chu kỳ dài</button>
+                 <button onclick="setCategory('nganngay')" class="category-tab tab-inactive px-4 py-2 rounded-full text-sm transition-all shadow-sm" data-cat="nganngay">Ngắn Ngày</button>
+            </div>
+            
+            <div class="mt-4 text-right text-xs text-gray-500 italic">
+                * Hiển thị <span id="countDisplay" class="font-bold text-vnpt-blue">0</span> gói cước phù hợp
+            </div>
+        </div>
+
+        <!-- Content List -->
+        <div class="flex-grow overflow-y-auto custom-scrollbar bg-gray-50 p-4 md:p-6" style="max-height: 600px;">
+            <div id="packagesList" class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <!-- Javascript will populate items here -->
+            </div>
+            <div id="noResults" class="hidden text-center py-10">
+                <div class="text-gray-300 text-6xl mb-4"><i class="fa-solid fa-box-open"></i></div>
+                <p class="text-gray-500 text-lg">Không tìm thấy gói cước nào phù hợp.</p>
+                <p class="text-gray-400 text-sm">Hãy thử nhập chính xác tên gói (VD: MAX100 thay vì MAX 100)</p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="bg-gray-800 text-white p-4 text-center text-xs md:text-sm flex-shrink-0">
+            <p class="font-bold opacity-80">ĐIỀU HÀNH KINH DOANH</p>
+            <p class="opacity-60 mt-1">Dữ liệu cập nhật theo văn bản ngày 20/03/2026</p>
+        </div>
+    </div>
+
+    <!-- Script to handle Data and Logic -->
+    <script>
+        // Data Source: Compiled from provided PDFs (VB111, PL1, PL2, PL3)
+        const packagesData = [
+            // --- DATA (Trả trước) ---
+            { old: "M10", new: "YT50G", price: "50k", cat: "data", note: "2GB/30 ngày + Youtube" },
+            { old: "M25", new: "VS50", price: "50k", cat: "data", note: "6GB + ON Plus" },
+            { old: "M50", new: "GPM79", price: "79k", cat: "data", note: "5GB + Galaxy Play" },
+            { old: "M1", new: "YOLO100M", price: "100k", cat: "data", note: "1GB/ngày + MXH" },
+            { old: "M3", new: "YOLO100M", price: "100k", cat: "data", note: "1GB/ngày + MXH" },
+            { old: "M4", new: "YOLO125G", price: "125k", cat: "data", note: "7GB/ngày + Game" },
+            { old: "M70", new: "DT90", price: "90k", cat: "data", note: "15GB/tháng" },
+            { old: "M40", new: "VS50", price: "50k", cat: "data", note: "6GB + ON Plus" },
+            { old: "M60", new: "DT70", price: "70k", cat: "data", note: "10GB/tháng" },
+            
+            { old: "MAX", new: "DT90", price: "90k", cat: "data", note: "15GB/tháng" },
+            { old: "MAX100", new: "BIG120", price: "120k", cat: "data", note: "2GB/ngày" },
+            { old: "MAX200", new: "BIG200", price: "200k", cat: "data", note: "4GB/ngày" }, // inferred pattern
+            { old: "MAX300", new: "BIG300", price: "300k", cat: "data", note: "6GB/ngày" }, // inferred pattern
+            { old: "MAXSV", new: "THAGA70N", price: "70k", cat: "data", note: "5GB/ngày + MXH" },
+            { old: "MAXS", new: "THAGA70N", price: "70k", cat: "data", note: "5GB/ngày + MXH" },
+            { old: "MAX59V", new: "SPOTV80", price: "80k", cat: "data", note: "1GB/ngày + MyTV SPOTV" },
+            { old: "3MAX59V", new: "3SPOTV80", price: "240k", cat: "data", note: "1GB/ngày + MyTV SPOTV" },
+            { old: "6MAX59V", new: "6SPOTV80", price: "480k", cat: "data", note: "1GB/ngày + MyTV SPOTV" },
+            { old: "12MAX59V", new: "12SPOTV80", price: "960k", cat: "data", note: "1GB/ngày + MyTV SPOTV" },
+            { old: "MAX70", new: "SPOTV80", price: "80k", cat: "data", note: "1GB/ngày + MyTV SPOTV" },
+            { old: "MAX79TV", new: "SPOTV80", price: "80k", cat: "data", note: "1GB/ngày + MyTV SPOTV" },
+            { old: "3MAX79V", new: "3SPOTV80", price: "240k", cat: "data", note: "1GB/ngày + MyTV SPOTV" },
+            { old: "6MAX79V", new: "6SPOTV80", price: "480k", cat: "data", note: "1GB/ngày + MyTV SPOTV" },
+            { old: "12MAX79V", new: "12SPOTV80", price: "960k", cat: "data", note: "1GB/ngày + MyTV SPOTV" },
+            { old: "MAX35K", new: "DT70", price: "70k", cat: "data", note: "10GB/tháng" },
+            { old: "MAX68K", new: "YOLO100M", price: "100k", cat: "data", note: "1GB/ngày + MXH" },
+            { old: "6MAX68K", new: "6YOLO100M", price: "600k", cat: "data", note: "1GB/ngày + MXH/MyTV" },
+            { old: "12MAX68K", new: "12YOLO100M", price: "1200k", cat: "data", note: "1GB/ngày + MXH/MyTV" },
+            { old: "MAX69K", new: "YOLO100M", price: "100k", cat: "data", note: "1GB/ngày + MXH" },
+            { old: "3MAX69K", new: "3YOLO100M", price: "300k", cat: "data", note: "1GB/ngày + MXH/MyTV" },
+            { old: "6MAX69K", new: "6YOLO100M", price: "600k", cat: "data", note: "1GB/ngày + MXH/MyTV" },
+            { old: "12MAX69K", new: "12YOLO100M", price: "1200k", cat: "data", note: "1GB/ngày + MXH/MyTV" },
+            { old: "MAX68F", new: "YOLO100M", price: "100k", cat: "data", note: "1GB/ngày + MXH" },
+            { old: "6MAX68F", new: "6YOLO100M", price: "600k", cat: "data", note: "1GB/ngày + MXH/MyTV" },
+            { old: "12MAX68F", new: "12YOLO100M", price: "1200k", cat: "data", note: "1GB/ngày + MXH/MyTV" },
+            { old: "MAX109V", new: "YOLO125V", price: "125k", cat: "data", note: "7GB/ngày + MyTV" },
+            { old: "3MAX109V", new: "3YOLO125V", price: "375k", cat: "data", note: "7GB/ngày + MyTV/VTVcab" },
+            { old: "6MAX109V", new: "6YOLO125V", price: "750k", cat: "data", note: "7GB/ngày + MyTV/VTVcab" },
+            { old: "12MAX109V", new: "12YOLO125V", price: "1500k", cat: "data", note: "7GB/ngày + MyTV/VTVcab" },
+            { old: "MAXSV2", new: "VS50", price: "50k", cat: "data", note: "6GB + ON Plus" },
+
+            { old: "BIG50Y", new: "THAGA70N", price: "70k", cat: "data", note: "5GB/ngày + MXH" },
+            { old: "6BIG50Y", new: "6THAGA70N", price: "420k", cat: "data", note: "5GB/ngày + TikTok/Youtube/Facebook" },
+            { old: "12BIG50Y", new: "12THAGA70N", price: "840k", cat: "data", note: "5GB/ngày + TikTok/Youtube/Facebook" },
+            { old: "BIG50YCN", new: "THAGA70N", price: "70k", cat: "data", note: "5GB/ngày + TikTok/Youtube/Facebook" },
+            { old: "6BIG50YCN", new: "6THAGA70N", price: "420k", cat: "data", note: "5GB/ngày + TikTok/Youtube/Facebook" },
+            { old: "12BIG50YCN", new: "12THAGA70N", price: "840k", cat: "data", note: "5GB/ngày + TikTok/Youtube/Facebook" },
+            { old: "BIGHS_4GB", new: "VS50", price: "50k", cat: "data", note: "6GB + ON Plus" },
+            
+            { old: "THAGA50", new: "THAGA70N", price: "70k", cat: "data", note: "5GB/ngày + MXH" },
+            { old: "3THAGA50", new: "3THAGA70N", price: "210k", cat: "data", note: "5GB/ngày + TikTok/Youtube/Facebook" },
+            { old: "6THAGA50", new: "6THAGA70N", price: "420k", cat: "data", note: "5GB/ngày + TikTok/Youtube/Facebook" },
+            { old: "12THAGA50", new: "12THAGA70N", price: "840k", cat: "data", note: "5GB/ngày + TikTok/Youtube/Facebook" },
+            { old: "THAGA", new: "THAGA70N", price: "70k", cat: "data", note: "5GB/ngày + MXH" },
+            { old: "THAGA60", new: "THAGA70N", price: "70k", cat: "data", note: "5GB/ngày + MXH" },
+            { old: "3THAGA60", new: "3THAGA70N", price: "210k", cat: "data", note: "5GB/ngày + TikTok/Youtube/Facebook" },
+            { old: "6THAGA60", new: "6THAGA70N", price: "420k", cat: "data", note: "5GB/ngày + TikTok/Youtube/Facebook" },
+            { old: "12THAGA60", new: "12THAGA70N", price: "840k", cat: "data", note: "5GB/ngày + TikTok/Youtube/Facebook" },
+            { old: "THAGA70", new: "YOLO100M", price: "100k", cat: "data", note: "1GB/ngày + MXH" },
+
+            { old: "ZONE50", new: "THAGA70N", price: "70k", cat: "data", note: "5GB/ngày + MXH" },
+            { old: "TN59", new: "THAGA70N", price: "70k", cat: "data", note: "5GB/ngày + TikTok/Youtube/Facebook" },
+            { old: "6TN59", new: "6THAGA70N", price: "420k", cat: "data", note: "5GB/ngày + TikTok/Youtube/Facebook" },
+            { old: "12TN59", new: "12THAGA70N", price: "840k", cat: "data", note: "5GB/ngày + TikTok/Youtube/Facebook" },
+            { old: "HOC60", new: "THAGA70N", price: "70k", cat: "data", note: "5GB/ngày + MXH" },
+            { old: "6HOC60", new: "6THAGA70N", price: "420k", cat: "data", note: "5GB/ngày + TikTok/Youtube/Facebook" },
+            { old: "12HOC60", new: "12THAGA70N", price: "840k", cat: "data", note: "5GB/ngày + TikTok/Youtube/Facebook" },
+            { old: "VC90", new: "YOLO100M", price: "100k", cat: "data", note: "1GB/ngày + MXH" },
+            { old: "TD49", new: "THAGA70N", price: "70k", cat: "data", note: "5GB/ngày + MXH" },
+            { old: "3TD49", new: "3THAGA70N", price: "210k", cat: "data", note: "5GB/ngày + TikTok/Youtube/Facebook" },
+            { old: "6TD49", new: "6THAGA70N", price: "420k", cat: "data", note: "5GB/ngày + TikTok/Youtube/Facebook" },
+            { old: "12TD49", new: "12THAGA70N", price: "840k", cat: "data", note: "5GB/ngày + TikTok/Youtube/Facebook" },
+            { old: "D30G", new: "BIG90", price: "90k", cat: "data", note: "1GB/ngày" },
+            { old: "BUM60", new: "THAGA70", price: "70k", cat: "data", note: "3GB/ngày" },
+            { old: "3BUM60", new: "3THAGA70", price: "210k", cat: "data", note: "3GB/ngày" },
+            { old: "6BUM60", new: "6THAGA70", price: "420k", cat: "data", note: "3GB/ngày" },
+            { old: "12BUM60", new: "12THAGA70", price: "840k", cat: "data", note: "3GB/ngày" },
+            { old: "S35", new: "THAGA70", price: "70k", cat: "data", note: "3GB/ngày" },
+            { old: "3S35", new: "3THAGA70", price: "210k", cat: "data", note: "3GB/ngày" },
+            { old: "6S35", new: "6THAGA70", price: "420k", cat: "data", note: "3GB/ngày" },
+            { old: "12S35", new: "12THAGA70", price: "840k", cat: "data", note: "3GB/ngày" },
+            { old: "S50", new: "THAGA70", price: "70k", cat: "data", note: "3GB/ngày" },
+            { old: "3S50", new: "3THAGA70", price: "210k", cat: "data", note: "3GB/ngày" },
+            { old: "6S50", new: "6THAGA70", price: "420k", cat: "data", note: "3GB/ngày" },
+            { old: "12S50", new: "12THAGA70", price: "840k", cat: "data", note: "3GB/ngày" },
+            { old: "BM69", new: "THAGA70", price: "70k", cat: "data", note: "3GB/ngày" },
+            { old: "7BM69", new: "6THAGA70", price: "420k", cat: "data", note: "3GB/ngày" },
+            { old: "14BM69", new: "12THAGA70", price: "840k", cat: "data", note: "3GB/ngày" },
+
+            // --- COMBO (Data + Thoại) ---
+            { old: "B100", new: "VD120", price: "120k", cat: "combo", note: "5GB/ngày + Thoại" },
+            { old: "B129", new: "VD149", price: "149k", cat: "combo", note: "6GB/ngày + Thoại" },
+            { old: "B30", new: "V49N", price: "49k", cat: "combo", note: "1000p nội + 70p ngoại" },
+            { old: "B50", new: "FCLUB", price: "79k", cat: "combo", note: "3GB/ngày + Thoại" },
+            { old: "B50SV", new: "FCLUB", price: "79k", cat: "combo", note: "3GB/ngày + Thoại" },
+            { old: "B99", new: "VD120", price: "120k", cat: "combo", note: "5GB/ngày + Thoại" },
+            { old: "BK50", new: "FCLUB", price: "79k", cat: "combo", note: "3GB/ngày + Thoại" },
+            { old: "BT50", new: "FCLUB", price: "79k", cat: "combo", note: "3GB/ngày + Thoại" },
+            { old: "BT50P", new: "FCLUB", price: "79k", cat: "combo", note: "3GB/ngày + Thoại" },
+            
+            { old: "BUM79", new: "VD89P", price: "89k", cat: "combo", note: "4GB/ngày + Thoại" },
+            { old: "BUM100", new: "VD120", price: "120k", cat: "combo", note: "5GB/ngày + Thoại" },
+            { old: "BUM150", new: "D169G", price: "169k", cat: "combo", note: "7GB/ngày + Thoại" },
+            { old: "BUM180", new: "FCLUB", price: "79k", cat: "combo", note: "3GB/ngày + Thoại" },
+
+            { old: "BXTRA", new: "VD89P", price: "89k", cat: "combo", note: "4GB/ngày + Thoại" },
+            { old: "BM99", new: "BM120", price: "120k", cat: "combo", note: "1.5GB/ngày + Thoại + Kaspersky" },
+            { old: "BIEN50K", new: "FCLUB", price: "79k", cat: "combo", note: "3GB/ngày + Thoại" },
+            { old: "B69", new: "VD89P", price: "89k", cat: "combo", note: "4GB/ngày + Thoại" },
+            { old: "B70", new: "VD89P", price: "89k", cat: "combo", note: "4GB/ngày + Thoại" },
+            { old: "B360", new: "V49N", price: "49k", cat: "combo", note: "1000p nội + 70p ngoại" },
+            { old: "BKID", new: "FHappy", price: "49k", cat: "combo", note: "2GB/ngày + 1000p nội" },
+
+            { old: "COMBO50", new: "FCLUB", price: "79k", cat: "combo", note: "3GB/ngày + Thoại" },
+            { old: "CCX", new: "VD89P", price: "89k", cat: "combo", note: "4GB/ngày + Thoại" },
+            { old: "CLUB", new: "V70PN", price: "70k", cat: "combo", note: "Thoại + 500MB" },
+
+            { old: "D15P", new: "VD89P", price: "89k", cat: "combo", note: "4GB/ngày + Thoại" },
+            { old: "D30P", new: "VD120", price: "120k", cat: "combo", note: "5GB/ngày + Thoại" },
+            { old: "D49P", new: "FCLUB", price: "79k", cat: "combo", note: "3GB/ngày + Thoại" },
+            { old: "D50Y", new: "FCLUB", price: "79k", cat: "combo", note: "3GB/ngày + Thoại" },
+            { old: "D60G", new: "VD120", price: "120k", cat: "combo", note: "5GB/ngày + Thoại" },
+            { old: "D60SV", new: "VD120", price: "120k", cat: "combo", note: "5GB/ngày + Thoại" },
+            { old: "D79F", new: "VD89P", price: "89k", cat: "combo", note: "4GB/ngày + Thoại" },
+            { old: "D79P", new: "VD89P", price: "89k", cat: "combo", note: "4GB/ngày + Thoại" },
+            { old: "D89F", new: "VD120", price: "120k", cat: "combo", note: "5GB/ngày + Thoại" },
+            { old: "D89K", new: "VD120", price: "120k", cat: "combo", note: "5GB/ngày + Thoại" },
+            { old: "D89Y", new: "VD120", price: "120k", cat: "combo", note: "5GB/ngày + Thoại" },
+            { old: "D90Z", new: "VD120", price: "120k", cat: "combo", note: "5GB/ngày + Thoại" },
+            { old: "D169G", new: "VD120", price: "120k", cat: "combo", note: "5GB/ngày + Thoại" },
+
+            { old: "FHAPPY", new: "FCLUB", price: "79k", cat: "combo", note: "3GB/ngày + Thoại" },
+            { old: "FPT79", new: "VD89P", price: "89k", cat: "combo", note: "4GB/ngày + Thoại" },
+            { old: "FTIN", new: "FHAPPY", price: "49k", cat: "combo", note: "2GB/ngày + 1000p nội" },
+            { old: "FLY", new: "FCLUB", price: "79k", cat: "combo", note: "3GB/ngày + Thoại" },
+            
+            { old: "GV35", new: "V49N", price: "49k", cat: "combo", note: "1000p nội + 70p ngoại" },
+            { old: "GV89", new: "VD120", price: "120k", cat: "combo", note: "5GB/ngày + Thoại" },
+            { old: "GO109", new: "VD120", price: "120k", cat: "combo", note: "5GB/ngày + Thoại" },
+            
+            { old: "HEY", new: "FCLUB", price: "79k", cat: "combo", note: "3GB/ngày + Thoại" },
+            { old: "HEY90", new: "VD120", price: "120k", cat: "combo", note: "5GB/ngày + Thoại" },
+            { old: "HEY79", new: "VD100F", price: "100k", cat: "combo", note: "1GB/ngày + Thoại + Free FB" },
+            { old: "HEY125", new: "VD150", price: "150k", cat: "combo", note: "2GB/ngày + Thoại" },
+            { old: "HOC60", new: "THAGA70N", price: "70k", cat: "combo", note: "5GB/ngày + MXH" },
+            { old: "HOC90", new: "VD120", price: "120k", cat: "combo", note: "5GB/ngày + Thoại" },
+            { old: "HS60", new: "FCLUB", price: "79k", cat: "combo", note: "3GB/ngày + Thoại" },
+            { old: "HT50", new: "FCLUB", price: "79k", cat: "combo", note: "3GB/ngày + Thoại" },
+            
+            { old: "SIEUTAM60", new: "FCLUB", price: "79k", cat: "combo", note: "3GB/ngày + Thoại" },
+            { old: "SM1", new: "VD120", price: "120k", cat: "combo", note: "5GB/ngày + Thoại" },
+            { old: "SG120", new: "VD149", price: "149k", cat: "combo", note: "6GB/ngày + Thoại" },
+            { old: "SM3", new: "VIP199", price: "199k", cat: "combo", note: "8GB/ngày + Thoại + MyTV" },
+
+            { old: "VD10", new: "V10N", price: "1k/ngày", cat: "combo", note: "10p nội + 10MB" },
+            { old: "VD79", new: "VD89P", price: "89k", cat: "combo", note: "4GB/ngày + Thoại" },
+            { old: "VD89", new: "VD120", price: "120k", cat: "combo", note: "5GB/ngày + Thoại" },
+            { old: "VD99", new: "VD120", price: "120k", cat: "combo", note: "5GB/ngày + Thoại" },
+            { old: "VD99PLUS", new: "VD120", price: "120k", cat: "combo", note: "5GB/ngày + Thoại" },
+            { old: "VD129", new: "VD149", price: "149k", cat: "combo", note: "6GB/ngày + Thoại" },
+            { old: "VD149", new: "VD149", price: "149k", cat: "combo", note: "6GB/ngày + Thoại" },
+            { old: "VD450", new: "VIP499", price: "499k", cat: "combo", note: "500GB/tháng + Thoại + 1 SIM phụ" },
+            
+            { old: "V20", new: "V25", price: "25k", cat: "combo", note: "40p gọi" },
+            { old: "V49", new: "VD89P", price: "89k", cat: "combo", note: "4GB/ngày + Thoại" },
+            { old: "VN50", new: "FCLUB", price: "79k", cat: "combo", note: "3GB/ngày + Thoại" },
+            { old: "VNBUM50", new: "FCLUB", price: "79k", cat: "combo", note: "3GB/ngày + Thoại" },
+
+            // Dòng FFM
+            { old: "FFMSI1", new: "V20N", price: "20k", cat: "combo", note: "Thoại nội mạng + Data ít" },
+            { old: "FFMSI2", new: "V20N", price: "20k", cat: "combo", note: "Thoại nội mạng + Data ít" },
+            { old: "FFMSI3", new: "V20N", price: "20k", cat: "combo", note: "Thoại nội mạng + Data ít" },
+            { old: "FFMSI4", new: "V20N", price: "20k", cat: "combo", note: "Thoại nội mạng + Data ít" },
+            { old: "FFMSO1", new: "V40N", price: "40k", cat: "combo", note: "Thoại + 250MB" },
+            { old: "FFMSO2", new: "V40N", price: "40k", cat: "combo", note: "Thoại + 250MB" },
+            { old: "FFMSO3", new: "V20N", price: "20k", cat: "combo", note: "Thoại + 100MB" },
+            { old: "FFMSO4", new: "V49N", price: "49k", cat: "combo", note: "1000p nội + 70p ngoại" },
+            { old: "FFMVI1", new: "V20N", price: "20k", cat: "combo", note: "Thoại + 100MB" },
+            { old: "FFMVI2", new: "V20N", price: "20k", cat: "combo", note: "Thoại + 100MB" },
+            { old: "FFMVI3", new: "V40N", price: "40k", cat: "combo", note: "Thoại + 250MB" },
+            { old: "FFMVI4", new: "V40N", price: "40k", cat: "combo", note: "Thoại + 250MB" },
+            { old: "FFMVI5", new: "V49N", price: "49k", cat: "combo", note: "1000p nội + 70p ngoại" },
+            { old: "FFMVO1", new: "FCLUB", price: "79k", cat: "combo", note: "3GB/ngày + Thoại" },
+            { old: "FFMVO2", new: "FCLUB", price: "79k", cat: "combo", note: "3GB/ngày + Thoại" },
+            { old: "FFMVO3", new: "V75", price: "75k", cat: "combo", note: "120p thoại" },
+            { old: "FFMVO4", new: "VD149", price: "149k", cat: "combo", note: "6GB/ngày + Thoại" },
+
+
+            // --- TRẢ SAU (Postpaid) ---
+            { old: "ALO31_BGG", new: "V99N", price: "99k", cat: "trasau", note: "1.500p nội + 150p ngoại" },
+            { old: "ALO51_BGG", new: "VD120M", price: "120k", cat: "trasau", note: "1GB/ngày + MXH + Thoại" },
+            { old: "ALO66_BGG", new: "VD120M", price: "120k", cat: "trasau", note: "1GB/ngày + MXH + Thoại" },
+            { old: "ALO70_LSN", new: "VD90", price: "90k", cat: "trasau", note: "1GB/ngày + Thoại" },
+            { old: "ALO70_BKN", new: "V99N", price: "99k", cat: "trasau", note: "1.500p nội + 150p ngoại" },
+            { old: "ALO79", new: "V99N", price: "99k", cat: "trasau", note: "1.500p nội + 150p ngoại" },
+            { old: "ALO89_HYN", new: "VD120M", price: "120k", cat: "trasau", note: "1GB/ngày + MXH + Thoại" },
+            { old: "ALO90_LSN", new: "VD120M", price: "120k", cat: "trasau", note: "1GB/ngày + MXH + Thoại" },
+            { old: "ALO109", new: "VD120M", price: "120k", cat: "trasau", note: "1GB/ngày + MXH + Thoại" },
+            { old: "ALO109_1", new: "VD120M", price: "120k", cat: "trasau", note: "1GB/ngày + MXH + Thoại" },
+            { old: "ALO109_2", new: "VD120M", price: "120k", cat: "trasau", note: "1GB/ngày + MXH + Thoại" },
+            { old: "ALO119_BKN", new: "VD120M", price: "120k", cat: "trasau", note: "1GB/ngày + MXH + Thoại" },
+            { old: "ALOGVI", new: "D159V", price: "159k", cat: "trasau", note: "6GB/ngày + MyTV + Thoại" },
+
+            { old: "BIENDAO", new: "V99N", price: "99k", cat: "trasau", note: "1.500p nội + 150p ngoại" },
+            { old: "BD159", new: "D159V", price: "159k", cat: "trasau", note: "6GB/ngày + MyTV + Thoại" },
+
+            { old: "D89F", new: "VD120", price: "120k", cat: "trasau", note: "5GB/ngày + Thoại" },
+            { old: "D99VT", new: "VD120", price: "120k", cat: "trasau", note: "5GB/ngày + Thoại" },
+            { old: "D99KPLUS", new: "VD120", price: "120k", cat: "trasau", note: "5GB/ngày + Thoại" },
+
+            { old: "ECO109", new: "VD120M", price: "120k", cat: "trasau", note: "1GB/ngày + MXH + Thoại" },
+            { old: "ECO109_DLC", new: "VD120M", price: "120k", cat: "trasau", note: "1GB/ngày + MXH + Thoại" },
+            { old: "ECO109_BDH", new: "VD120M", price: "120k", cat: "trasau", note: "1GB/ngày + MXH + Thoại" },
+
+            { old: "FVIP", new: "VIP249", price: "249k", cat: "trasau", note: "10GB/ngày + Nhóm + Thoại" },
+            { old: "FPLUS", new: "VD90", price: "90k", cat: "trasau", note: "1GB/ngày + Thoại" },
+            { old: "FCVIP", new: "VIP199", price: "199k", cat: "trasau", note: "8GB/ngày + Nhóm + Thoại" },
+            { old: "FCPLUS", new: "V99N", price: "99k", cat: "trasau", note: "1.500p nội + 150p ngoại" },
+
+            { old: "SANH+", new: "VIP249", price: "249k", cat: "trasau", note: "10GB/ngày + Nhóm + Thoại" },
+            { old: "SANG+", new: "VIPPLUS", price: "1.499k", cat: "trasau", note: "Gói VIP Đặc Biệt" },
+            { old: "SPEED79", new: "VD120M", price: "120k", cat: "trasau", note: "1GB/ngày + MXH + Thoại" },
+            { old: "SPEED299", new: "VIP349", price: "349k", cat: "trasau", note: "10GB/ngày + 500 SMS + Thoại" },
+
+            { old: "TALK21", new: "V99N", price: "99k", cat: "trasau", note: "1.500p nội + 150p ngoại" },
+            { old: "TALK45", new: "V99N", price: "99k", cat: "trasau", note: "1.500p nội + 150p ngoại" },
+            { old: "TG349", new: "VIP349", price: "349k", cat: "trasau", note: "10GB/ngày + 500 SMS + Thoại" },
+            { old: "TG499", new: "VIP499", price: "499k", cat: "trasau", note: "500GB/tháng + 1 SIM Phụ" },
+            { old: "TG595", new: "VIP599", price: "599k", cat: "trasau", note: "500GB/tháng + 1 SIM Phụ" },
+            { old: "TG695", new: "VIP699", price: "699k", cat: "trasau", note: "700GB/tháng + 1 SIM Phụ" },
+            { old: "TG795", new: "VIP899", price: "899k", cat: "trasau", note: "900GB/tháng + 1 SIM Phụ" },
+            { old: "TG799", new: "VIP899", price: "899k", cat: "trasau", note: "900GB/tháng + 1 SIM Phụ" },
+            { old: "TP299", new: "VIP349", price: "349k", cat: "trasau", note: "10GB/ngày + 500 SMS + Thoại" },
+            { old: "TP549", new: "VIP599", price: "599k", cat: "trasau", note: "500GB/tháng + 1 SIM Phụ" },
+            { old: "TP649", new: "VIP699", price: "699k", cat: "trasau", note: "700GB/tháng + 1 SIM Phụ" },
+            { old: "TP849", new: "VIP899", price: "899k", cat: "trasau", note: "900GB/tháng + 1 SIM Phụ" },
+
+            { old: "VD99", new: "VD120M", price: "120k", cat: "trasau", note: "1GB/ngày + MXH + Thoại" },
+            { old: "VD299", new: "VIP349", price: "349k", cat: "trasau", note: "10GB/ngày + 500 SMS + Thoại" },
+            { old: "VINA70", new: "VD90", price: "90k", cat: "trasau", note: "1GB/ngày + Thoại" },
+            { old: "VINA118", new: "D159V", price: "159k", cat: "trasau", note: "6GB/ngày + MyTV + Thoại" },
+            { old: "V49", new: "FCLUB", price: "79k", cat: "trasau", note: "3GB/ngày + Thoại" },
+            { old: "V99", new: "V99N", price: "99k", cat: "trasau", note: "1.500p nội + 150p ngoại" },
+
+            // --- NGẮN NGÀY ---
+            { old: "VC5", new: "D6V", price: "6k", cat: "nganngay", note: "2GB/24h + MyTV" },
+            { old: "FFDD1", new: "MI_D6V", price: "6k", cat: "nganngay", note: "2GB/24h + MyTV" },
+            { old: "FFDD2", new: "MI_D6V", price: "6k", cat: "nganngay", note: "2GB/24h + MyTV" },
+            { old: "FFDD3", new: "MI_D2", price: "10k", cat: "nganngay", note: "2GB/24h" },
+            { old: "FFDD4", new: "MI_D20", price: "20k", cat: "nganngay", note: "4GB/24h" },
+            { old: "FFMD1", new: "YOLO35", price: "35k", cat: "nganngay", note: "1GB/ngày (15 ngày)" },
+            { old: "FFMD2", new: "YOLO35", price: "35k", cat: "nganngay", note: "1GB/ngày (15 ngày)" },
+            { old: "FFMD3", new: "YOLO35", price: "35k", cat: "nganngay", note: "1GB/ngày (15 ngày)" }
+        ];
+
+        let currentCategory = 'all';
+
+        function renderPackages(data) {
+            const list = document.getElementById('packagesList');
+            const noResults = document.getElementById('noResults');
+            const countDisplay = document.getElementById('countDisplay');
+            
+            list.innerHTML = '';
+            
+            if (data.length === 0) {
+                noResults.classList.remove('hidden');
+            } else {
+                noResults.classList.add('hidden');
+                data.forEach(pkg => {
+                    // Mapping categories to labels
+                    let catLabel = '';
+                    let catColor = '';
+                    switch(pkg.cat) {
+                        case 'data': catLabel = 'Data'; catColor = 'bg-blue-100 text-blue-800'; break;
+                        case 'combo': catLabel = 'Combo'; catColor = 'bg-green-100 text-green-800'; break;
+                        case 'trasau': catLabel = 'Trả Sau'; catColor = 'bg-orange-100 text-orange-800'; break;
+                        case 'nganngay': catLabel = 'Ngắn ngày'; catColor = 'bg-purple-100 text-purple-800'; break;
+                        case 'trasau312': catLabel = 'Trả sau'; catColor = 'bg-pink-100 text-pink-800'; break;
+                        case 'ckd312': catLabel = 'CKD VB312'; catColor = 'bg-cyan-100 text-cyan-800'; break;
+                    }
+
+                    const card = `
+                        <div class="bg-white rounded-xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+                            <div class="absolute top-0 right-0 w-16 h-16 bg-gray-50 rounded-bl-full -mr-8 -mt-8 z-0"></div>
+                            
+                            <div class="relative z-10">
+                                <div class="flex justify-between items-start mb-3">
+                                    <div>
+                                        <div class="text-xs font-bold text-gray-400 uppercase tracking-wide">Gói cũ (Dừng)</div>
+                                        <div class="text-2xl font-black text-gray-700">${pkg.old}</div>
+                                    </div>
+                                    <span class="text-xs px-2 py-1 rounded-md font-bold ${catColor}">${catLabel}</span>
+                                </div>
+
+                                <div class="flex items-center justify-center my-2 text-gray-300">
+                                    <i class="fa-solid fa-arrow-down"></i>
+                                </div>
+
+                                <div class="bg-blue-50 rounded-lg p-3 border border-blue-100 group-hover:border-vnpt-blue transition-colors">
+                                    <div class="text-xs font-bold text-vnpt-blue uppercase mb-1">Chuyển sang gói mới</div>
+                                    <div class="flex justify-between items-end">
+                                        <div class="text-xl font-black text-vnpt-blue">${pkg.new}</div>
+                                        <div class="text-lg font-bold text-gray-800">${pkg.price}</div>
+                                    </div>
+                                    <div class="mt-2 text-xs text-gray-600 bg-white bg-opacity-60 p-1 rounded">
+                                        <i class="fa-solid fa-gift text-yellow-500 mr-1"></i> ${pkg.note}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    list.innerHTML += card;
+                });
+            }
+            countDisplay.innerText = data.length;
+        }
+
+        const vb312OldPackages = new Set([
+            "B100","B129","B30","B50","B50SV","B99","BM99","BT50","BT50P","BUM100","BUM150","BUM79",
+            "BXTRA","D15P","D30P","D49P","D50P","D50Y","D60SV","D79F","D79P","D89F","D89K","D89Y",
+            "D90Z","FHAPPY","GV89","HEY","HOC90","HS60","SG120","VD129","VD79","VD89",
+            "M10","MAX","MAX59V","MAX79TV","MAX68F","MAX68K","MAX69K","MAX109V","MAXSV","MAXS",
+            "BUM60","S35","S50","BM69","THAGA50","THAGA60","BIG50Y","BIG50YCN","HOC60","TN59","TD49",
+            "3MAX109V","6MAX109V","12MAX109V","3MAX59V","6MAX59V","12MAX59V","3MAX79V","6MAX79V","12MAX79V",
+            "3THAGA50","6THAGA50","12THAGA50","3THAGA60","6THAGA60","12THAGA60","3TD49","6TD49","12TD49",
+            "6HOC60","12HOC60","6TN59","12TN59","3BUM60","6BUM60","12BUM60","3S35","6S35","12S35",
+            "3S50","6S50","12S50","7BM69","14BM69","6BIG50Y","12BIG50Y","6BIG50YCN","12BIG50YCN",
+            "3MAX69K","6MAX69K","12MAX69K","6MAX68F","12MAX68F","6MAX68K","12MAX68K"
+        ]);
+
+        const vb312LongCyclePackages = new Set([
+            "B100","B129","B30","B50","B50SV","B99","BM99","BUM100","BUM150","BUM79","BXTRA",
+            "D15P","D30P","D49P","D50P","D50Y","D79F","D79P","D89F","D89K","D89Y","D90Z",
+            "FHAPPY","GV89","HEY","HOC90","HS60","SG120","VD129","VD79","VD89",
+            "3MAX109V","6MAX109V","12MAX109V","3MAX59V","6MAX59V","12MAX59V","3MAX79V","6MAX79V","12MAX79V",
+            "3THAGA50","6THAGA50","12THAGA50","3THAGA60","6THAGA60","12THAGA60","3TD49","6TD49","12TD49",
+            "6HOC60","12HOC60","6TN59","12TN59","3BUM60","6BUM60","12BUM60","3S35","6S35","12S35",
+            "3S50","6S50","12S50","7BM69","14BM69","6BIG50Y","12BIG50Y","6BIG50YCN","12BIG50YCN",
+            "3MAX69K","6MAX69K","12MAX69K","6MAX68F","12MAX68F","6MAX68K","12MAX68K"
+        ]);
+
+        function filterPackages() {
+            const query = document.getElementById('searchInput').value.toUpperCase().trim();
+            
+            const filtered = packagesData.filter(pkg => {
+                const matchesSearch = pkg.old.toUpperCase().includes(query) || pkg.new.toUpperCase().includes(query);
+                const matchesCat = currentCategory === 'all'
+                    || pkg.cat === currentCategory
+                    || (currentCategory === 'trasau312' && vb312OldPackages.has(pkg.old.toUpperCase()))
+                    || (currentCategory === 'ckd312' && vb312LongCyclePackages.has(pkg.old.toUpperCase()));
+                return matchesSearch && matchesCat;
+            });
+
+            renderPackages(filtered);
+        }
+
+        function setCategory(cat) {
+            currentCategory = cat;
+            
+            // Update UI tabs
+            document.querySelectorAll('.category-tab').forEach(btn => {
+                if (btn.dataset.cat === cat) {
+                    btn.classList.add('tab-active');
+                    btn.classList.remove('tab-inactive');
+                } else {
+                    btn.classList.remove('tab-active');
+                    btn.classList.add('tab-inactive');
+                }
+            });
+
+            filterPackages(); // Re-run filter with new category
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            renderPackages(packagesData);
+        });
+		
+		
+		function exportPPT() {
+
+    let pptx = new PptxGenJS();
+    pptx.layout = "LAYOUT_16x9";
+
+    // =============================
+    // Slide 1: Tổng quan
+    // =============================
+    let slideIntro = pptx.addSlide();
+
+    slideIntro.addText("BÁO CÁO CHUYỂN ĐỔI GÓI CƯỚC 2026", {
+        x: 1,
+        y: 1,
+        fontSize: 32,
+        bold: true,
+        color: "003366"
+    });
+
+    const countData = packagesData.filter(p => p.cat === 'data').length;
+    const countCombo = packagesData.filter(p => p.cat === 'combo').length;
+    const countTrasau = packagesData.filter(p => p.cat === 'trasau').length;
+    const countNganNgay = packagesData.filter(p => p.cat === 'nganngay').length;
+
+    slideIntro.addText(
+        `Data: ${countData} gói\nCombo: ${countCombo} gói\nTrả Sau: ${countTrasau} gói\nNgắn Ngày: ${countNganNgay} gói`,
+        { x: 1, y: 2, fontSize: 18 }
+    );
+
+    slideIntro.addChart(pptx.ChartType.pie, [
+        {
+            name: "Phân loại",
+            labels: ["Data", "Combo", "Trả Sau", "Ngắn Ngày"],
+            values: [countData, countCombo, countTrasau, countNganNgay]
+        }
+    ], { x: 5, y: 1.5, w: 4, h: 4 });
+
+
+    // =============================
+    // Slide chi tiết từng loại
+    // =============================
+
+    const categories = [
+        { key: 'data', name: 'GÓI DATA' },
+        { key: 'combo', name: 'GÓI COMBO' },
+        { key: 'trasau', name: 'GÓI TRẢ SAU' },
+        { key: 'nganngay', name: 'GÓI NGẮN NGÀY' }
+    ];
+
+    categories.forEach(cat => {
+
+        const filtered = packagesData.filter(p => p.cat === cat.key);
+
+        const chunkSize = 25;
+
+        for (let i = 0; i < filtered.length; i += chunkSize) {
+
+            const chunk = filtered.slice(i, i + chunkSize);
+
+            let slide = pptx.addSlide();
+
+            slide.addText(cat.name, {
+                x: 0.5,
+                y: 0.5,
+                fontSize: 24,
+                bold: true,
+                color: "0068FF"
+            });
+
+            let rows = [
+                [
+                    { text: "Gói cũ", options: { bold: true } },
+                    { text: "Gói mới", options: { bold: true } },
+                    { text: "Giá", options: { bold: true } },
+                    { text: "Ghi chú", options: { bold: true } }
+                ]
+            ];
+
+            chunk.forEach(pkg => {
+                rows.push([
+                    pkg.old,
+                    pkg.new,
+                    pkg.price,
+                    pkg.note
+                ]);
+            });
+
+            slide.addTable(rows, {
+                x: 0.5,
+                y: 1.2,
+                w: 9,
+                fontSize: 11,
+                border: { type: "solid", color: "CCCCCC" }
+            });
+        }
+
+    });
+
+    pptx.writeFile("BaoCao_ChuyenDoiGoiCuoc_2026.pptx");
+}
+
+
+    </script>
+</body>
+</html>
