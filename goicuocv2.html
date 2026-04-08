@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tra Cứu Chuyển Đổi Gói Cước VNPT - Tích Hợp AI & VB312</title>
+    <title>Tra Cứu Chuyển Đổi Gói Cước - Tích Hợp AI</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
@@ -516,8 +516,8 @@
 
         // --- GEMINI AI INTEGRATION ---
         
-        const apiKey = ""; // Set environment key here if running locally
-        const systemPrompt = `Bạn là David - Trợ lý AI chuyên nghiệp của VNPT VinaPhone. 
+        const apiKey = "AIzaSyCa1Jgb7CgaYQVrCpzRBnDWeScJLHIrfHE"; // Đã tích hợp API Key của bạn
+        const systemPrompt = `Bạn là David - Trợ lý AI chuyên nghiệp của Điều hành Kinh doanh. 
         Nhiệm vụ của bạn là tư vấn cho khách hàng về việc chuyển đổi gói cước dựa trên dữ liệu sau: ${JSON.stringify(packagesData)}.
         
         Quy tắc trả lời:
@@ -537,7 +537,7 @@
             const typingId = showTyping();
 
             try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
