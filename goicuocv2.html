@@ -215,6 +215,8 @@
         </button>
     </div>
 
+    <script src="gemini-config.example.js"></script>
+    <script src="gemini-config.js"></script>
     <!-- Script to handle Data and Logic -->
     <script>
         const packagesData = [
@@ -515,8 +517,12 @@
         }
 
         // --- GEMINI AI INTEGRATION ---
-        
-        const apiKey = "AIzaSyCa1Jgb7CgaYQVrCpzRBnDWeScJLHIrfHE"; 
+        // Key lấy từ: window.__GEMINI_API_KEY__ (gemini-config.js) hoặc localStorage 'gemini_api_key' — không hardcode trong repo
+        function getGeminiApiKey() {
+            const fromWindow = typeof window.__GEMINI_API_KEY__ === 'string' ? window.__GEMINI_API_KEY__.trim() : '';
+            const fromStorage = (typeof localStorage !== 'undefined' && localStorage.getItem('gemini_api_key')) ? localStorage.getItem('gemini_api_key').trim() : '';
+            return fromWindow || fromStorage || '';
+        }
         const systemPrompt = `Bạn là David - Trợ lý AI chuyên nghiệp của VNPT VinaPhone. 
         Nhiệm vụ của bạn là tư vấn cho khách hàng về việc chuyển đổi gói cước dựa trên dữ liệu sau: ${JSON.stringify(packagesData)}.
         
@@ -529,6 +535,21 @@
 
         async function callGeminiAPI(userMessage) {
             if (!userMessage) return;
+
+            const apiKey = getGeminiApiKey();
+            if (!apiKey) {
+                addMessage(userMessage, 'user');
+                addMessage(
+                    '⚠️ **Chưa cấu hình API key Gemini.**\n\n' +
+                    '- Tạo key mới tại [Google AI Studio](https://aistudio.google.com/apikey) (hoặc Google Cloud Console).\n' +
+                    '- **Xóa/vô hiệu hóa** key cũ đã bị lộ trong bảng điều khiển Google.\n' +
+                    '- Copy `gemini-config.example.js` → `gemini-config.js`, dán key vào `window.__GEMINI_API_KEY__` (file này nằm trong .gitignore).\n' +
+                    '- Hoặc mở Console (F12) và chạy một lần: `localStorage.setItem(\'gemini_api_key\', \'KEY_CUA_BAN\')`.\n\n' +
+                    '**Lưu ý:** Gọi API trực tiếp từ trình duyệt vẫn có thể bị lộ key qua DevTools; bản production nên gọi qua backend.',
+                    'ai'
+                );
+                return;
+            }
 
             addMessage(userMessage, 'user');
             const typingId = showTyping();
