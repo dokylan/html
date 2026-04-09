@@ -1,7 +1,18 @@
 // Debug script để kiểm tra API key
 console.log('=== DEBUG API KEY ===');
-console.log('From window.__GEMINI_API_KEY__:', window.__GEMINI_API_KEY__ || 'NOT SET');
 console.log('From localStorage:', localStorage.getItem('gemini_api_key') || 'NOT SET');
+console.log('From window.__GEMINI_API_KEY__:', window.__GEMINI_API_KEY__ || 'NOT SET');
+
+// Simulate getGeminiApiKey function
+function debugGetGeminiApiKey() {
+    const fromStorage = (typeof localStorage !== 'undefined' && localStorage.getItem('gemini_api_key')) ? localStorage.getItem('gemini_api_key').trim() : '';
+    const fromWindow = typeof window.__GEMINI_API_KEY__ === 'string' && window.__GEMINI_API_KEY__.trim() !== 'YOUR_API_KEY_HERE' ? window.__GEMINI_API_KEY__.trim() : '';
+    const result = fromStorage || fromWindow || '';
+    console.log('Final API key used:', result ? result.substring(0, 20) + '...' : 'EMPTY');
+    return result;
+}
+
+debugGetGeminiApiKey();
 
 // Function để test API key
 async function testAPIKey() {
