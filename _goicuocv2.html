@@ -217,6 +217,7 @@
 
     <script src="gemini-config.example.js"></script>
     <script src="gemini-config.js"></script>
+    <script src="debug-api.js"></script>
     <!-- Script to handle Data and Logic -->
     <script>
         const packagesData = [
@@ -517,11 +518,11 @@
         }
 
         // --- GEMINI AI INTEGRATION ---
-        // Key lấy từ: window.__GEMINI_API_KEY__ (gemini-config.js) hoặc localStorage 'gemini_api_key' — không hardcode trong repo
+        // Key lấy từ: localStorage 'gemini_api_key' (ưu tiên cho production) hoặc window.__GEMINI_API_KEY__ (cho local dev) — không hardcode trong repo
         function getGeminiApiKey() {
-            const fromWindow = typeof window.__GEMINI_API_KEY__ === 'string' ? window.__GEMINI_API_KEY__.trim() : '';
             const fromStorage = (typeof localStorage !== 'undefined' && localStorage.getItem('gemini_api_key')) ? localStorage.getItem('gemini_api_key').trim() : '';
-            return fromWindow || fromStorage || '';
+            const fromWindow = typeof window.__GEMINI_API_KEY__ === 'string' && window.__GEMINI_API_KEY__.trim() !== 'YOUR_API_KEY_HERE' ? window.__GEMINI_API_KEY__.trim() : '';
+            return fromStorage || fromWindow || '';
         }
         const systemPrompt = `Bạn là David - Trợ lý AI chuyên nghiệp của ĐHKD. 
         Nhiệm vụ của bạn là tư vấn cho khách hàng về việc chuyển đổi gói cước dựa trên dữ liệu sau: ${JSON.stringify(packagesData)}.

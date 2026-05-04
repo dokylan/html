@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infographic - Hướng Dẫn Nhập Mã Nhân Viên (Trực Quan)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .step-card {
+            transition: all 0.3s ease;
+        }
+        .step-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        /* Style cho phần mô phỏng màn hình điện thoại */
+        .phone-mockup {
+            background-color: #f9fafb;
+            border: 4px solid #e5e7eb;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05);
+        }
+        .phone-notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 12px;
+            background-color: #e5e7eb;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body class="flex justify-center py-4 md:py-10">
+
+    <!-- Container Infographic -->
+    <div class="max-w-4xl w-full bg-white shadow-2xl rounded-2xl md:rounded-3xl overflow-hidden border border-gray-100">
+        
+        <!-- Header Section -->
+        <div class="bg-gradient-to-br from-blue-700 via-blue-600 to-blue-500 p-8 md:p-12 text-center text-white relative overflow-hidden">
+            <!-- Background Decoration -->
+            <div class="absolute -top-10 -right-10 opacity-10 transform rotate-12">
+                <i class="fas fa-mobile-alt text-[15rem]"></i>
+            </div>
+            <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-400 via-green-400 to-blue-400"></div>
+
+            <div class="relative z-10">
+                <span class="inline-block py-1 px-3 rounded-full bg-blue-800 bg-opacity-50 text-blue-100 text-xs font-semibold tracking-widest uppercase mb-4 border border-blue-400">
+                    Cẩm nang Kênh Điểm Bán
+                </span>
+                <h1 class="text-3xl md:text-5xl font-bold mb-4 leading-tight">
+                    HƯỚNG DẪN TÍNH NĂNG <br> 
+                    <span class="text-yellow-300 drop-shadow-md">"NHẬP MÃ NHÂN VIÊN"</span>
+                </h1>
+                <p class="text-base md:text-xl opacity-90 max-w-2xl mx-auto">
+                    Giải pháp kết nối trực tiếp Khách hàng & Điểm bán nhanh chóng, giúp ghi nhận doanh số chính xác.
+                </p>
+            </div>
+        </div>
+
+        <!-- Section Hướng dẫn (Có Mockup) -->
+        <div class="p-6 md:p-10 bg-gray-50">
+            <h2 class="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-10">
+                <i class="fas fa-tasks text-blue-500 mr-2"></i> 4 Bước Khách Hàng Thực Hiện
+            </h2>
+
+            <div class="space-y-8">
+                
+                <!-- Step 1 -->
+                <div class="step-card bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative">
+                    <div class="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-700 text-white rounded-full flex items-center justify-center font-bold text-2xl shadow-lg border-4 border-white z-10">1</div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center pt-2">
+                        <!-- Text -->
+                        <div>
+                            <h3 class="text-xl font-bold text-blue-800 mb-3">Truy cập Trang cá nhân</h3>
+                            <p class="text-gray-600 mb-4 leading-relaxed">Từ màn hình chính của ứng dụng, hướng dẫn khách hàng chú ý góc trên cùng bên trái màn hình. <br><br>Nhấn vào biểu tượng <strong>Avatar (ảnh đại diện)</strong> của tài khoản để mở Menu cá nhân.</p>
+                        </div>
+                        <!-- Mockup Image -->
+                        <div class="flex justify-center">
+                            <div class="phone-mockup w-64 h-48 bg-cover bg-center" style="background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); background-color: #e0f2fe;">
+                                <div class="phone-notch"></div>
+                                <!-- App Header Mock -->
+                                <div class="absolute top-0 left-0 right-0 p-4 pt-6 bg-gradient-to-b from-white/80 to-transparent">
+                                    <div class="flex justify-between items-center">
+                                        <!-- Highlight Avatar -->
+                                        <div class="relative">
+                                            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 border-2 border-white shadow-md relative z-10">
+                                                <i class="fas fa-user text-xl"></i>
+                                            </div>
+                                            <!-- Hiệu ứng Ping chú ý -->
+                                            <div class="absolute inset-0 rounded-full border-4 border-red-500 animate-ping opacity-75"></div>
+                                            <!-- Chấm đỏ thông báo -->
+                                            <div class="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-white z-20"></div>
+                                        </div>
+                                        
+                                        <div class="flex space-x-2">
+                                            <div class="w-10 h-10 bg-white/80 rounded-full flex items-center justify-center text-gray-600"><i class="fas fa-search"></i></div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 h-16 bg-white/50 rounded-xl"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="step-card bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative">
+                    <div class="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-700 text-white rounded-full flex items-center justify-center font-bold text-2xl shadow-lg border-4 border-white z-10">2</div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center pt-2">
+                        <!-- Text -->
+                        <div class="md:order-2">
+                            <h3 class="text-xl font-bold text-blue-800 mb-3">Chọn "Nhân viên hỗ trợ"</h3>
+                            <p class="text-gray-600 mb-4 leading-relaxed">Trong danh sách Menu <strong>Cá nhân</strong> vừa hiện ra, khách hàng kéo xuống phần <em>Cài đặt</em>.<br><br>Tìm và nhấn chọn vào dòng <strong>"Nhân viên hỗ trợ"</strong> (Có biểu tượng nhóm người).</p>
+                        </div>
+                        <!-- Mockup Image -->
+                        <div class="flex justify-center md:order-1">
+                            <div class="phone-mockup w-64 h-56 bg-white">
+                                <div class="phone-notch"></div>
+                                <div class="pt-6 px-4">
+                                    <div class="h-4 w-1/3 bg-gray-200 rounded mb-4"></div>
+                                    
+                                    <!-- List items -->
+                                    <div class="flex items-center py-3 border-b border-gray-100">
+                                        <i class="fas fa-fingerprint text-gray-400 w-6 text-center"></i>
+                                        <div class="ml-3 h-3 w-1/2 bg-gray-200 rounded"></div>
+                                    </div>
+                                    <div class="flex items-center py-3 border-b border-gray-100">
+                                        <i class="fas fa-share-alt text-gray-400 w-6 text-center"></i>
+                                        <div class="ml-3 h-3 w-1/3 bg-gray-200 rounded"></div>
+                                    </div>
+                                    
+                                    <!-- Highlighted Item -->
+                                    <div class="flex items-center py-3 px-2 bg-blue-50 border-l-4 border-blue-500 rounded-r-md mt-1 relative shadow-sm">
+                                        <i class="fas fa-users text-blue-600 w-6 text-center"></i>
+                                        <div class="ml-3 font-semibold text-blue-900 text-sm">Nhân viên hỗ trợ</div>
+                                        <i class="fas fa-chevron-right absolute right-2 text-blue-300 text-xs"></i>
+                                        <!-- Bàn tay mô phỏng click -->
+                                        <i class="fas fa-hand-pointer absolute right-8 top-6 text-yellow-500 text-xl drop-shadow-md animate-bounce"></i>
+                                    </div>
+
+                                    <div class="flex items-center py-3 mt-1">
+                                        <i class="fas fa-sign-out-alt text-gray-400 w-6 text-center"></i>
+                                        <div class="ml-3 h-3 w-1/4 bg-gray-200 rounded"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="step-card bg-blue-50 p-6 rounded-2xl shadow-sm border border-blue-200 relative">
+                    <div class="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-yellow-400 to-yellow-600 text-white rounded-full flex items-center justify-center font-bold text-2xl shadow-lg border-4 border-white z-10">3</div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center pt-2">
+                        <!-- Text -->
+                        <div>
+                            <h3 class="text-xl font-bold text-blue-900 mb-3 flex items-center">
+                                Nhập Mã Nhân Viên <span class="ml-2 bg-red-100 text-red-600 text-[10px] uppercase px-2 py-1 rounded font-bold tracking-wider">Quan trọng</span>
+                            </h3>
+                            <p class="text-gray-700 mb-3">Màn hình nhập liệu hiện ra, yêu cầu điền:</p>
+                            <ul class="list-none space-y-2 mb-4">
+                                <li class="flex items-start">
+                                    <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                                    <span class="text-gray-700"><strong>Mã nhân viên (*):</strong> Nhập chính xác mã của cửa hàng/nhân viên (VD: <span class="bg-white px-2 py-0.5 rounded border border-gray-300 font-mono text-blue-700">KBH156729</span>).</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                                    <span class="text-gray-700"><strong>Nội dung hỗ trợ:</strong> Ghi chú yêu cầu hoặc số điện thoại (VD: <span class="bg-white px-2 py-0.5 rounded border border-gray-300 font-mono text-blue-700">KBH156729_084</span>).</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <!-- Mockup Form -->
+                        <div class="flex justify-center">
+                            <div class="phone-mockup w-64 h-56 bg-white p-4 pt-8">
+                                <div class="phone-notch"></div>
+                                <div class="text-center font-semibold text-gray-800 text-sm border-b pb-2 mb-4">Nhân viên hỗ trợ</div>
+                                
+                                <div class="mb-4">
+                                    <label class="text-xs text-gray-500 mb-1 block">Mã nhân viên <span class="text-red-500">*</span></label>
+                                    <div class="border-2 border-blue-400 rounded-lg p-2 bg-blue-50 text-gray-800 font-mono text-sm relative">
+                                        KBH156729<span class="border-r-2 border-blue-600 animate-pulse ml-0.5 absolute"></span>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label class="text-xs text-gray-500 mb-1 block">Nội dung hỗ trợ</label>
+                                    <div class="border border-gray-300 rounded-lg p-2 h-12 text-gray-800 font-mono text-sm">
+                                        KBH156729_084
+                                    </div>
+                                    <div class="text-right text-[10px] text-gray-400 mt-0.5">3/100</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="step-card bg-white p-6 rounded-2xl shadow-sm border border-green-100 relative">
+                    <div class="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 text-white rounded-full flex items-center justify-center font-bold text-2xl shadow-lg border-4 border-white z-10">4</div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center pt-2">
+                        <!-- Text -->
+                        <div class="md:order-2">
+                            <h3 class="text-xl font-bold text-green-600 mb-3">Xác nhận thành công</h3>
+                            <p class="text-gray-600 mb-4 leading-relaxed">Sau khi nhấn nút <strong class="text-blue-600">Xong</strong> trên bàn phím, hệ thống sẽ lưu thông tin.<br><br>Màn hình sẽ hiển thị thẻ thông tin Công ty/Đại lý hỗ trợ (VD: <em>CÔNG TY CỔ PHẦN KASACO</em>) chứng tỏ việc kết nối đã hoàn tất.</p>
+                        </div>
+                        <!-- Mockup Result -->
+                        <div class="flex justify-center md:order-1">
+                            <div class="phone-mockup w-64 h-40 bg-gray-50 p-3 pt-6 relative">
+                                <div class="phone-notch"></div>
+                                <div class="flex justify-between items-center mb-3 mt-2">
+                                    <div class="text-sm font-bold text-gray-800">Nhân viên hỗ trợ</div>
+                                    <div class="text-[10px] bg-white border border-gray-300 px-2 py-1 rounded-full text-gray-600 shadow-sm">
+                                        <i class="fas fa-history mr-1"></i>Lịch sử
+                                    </div>
+                                </div>
+                                
+                                <!-- Success Card Mock -->
+                                <div class="bg-white rounded-xl p-3 border border-gray-200 flex items-center shadow-md relative overflow-hidden transform scale-105">
+                                    <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-green-500"></div>
+                                    <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center mr-3 border border-gray-100 shrink-0">
+                                        <!-- Sử dụng placeholder avatar thay cho ảnh thật -->
+                                        <i class="fas fa-building text-blue-500"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-gray-800 text-[11px] leading-tight mb-1">CÔNG TY CỔ PHẦN KASACO</div>
+                                        <div class="text-gray-500 text-[10px] font-mono">KBH156729</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Tip Section -->
+        <div class="bg-yellow-50 p-6 md:p-8 border-t border-yellow-200">
+            <div class="flex flex-col md:flex-row items-center md:items-start text-center md:text-left">
+                <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center text-yellow-500 text-3xl mb-4 md:mb-0 md:mr-6 shrink-0 shadow-inner">
+                    <i class="fas fa-lightbulb"></i>
+                </div>
+                <div>
+                    <h4 class="font-bold text-yellow-800 text-lg mb-2">Bí kíp tăng chuẩn hóa cho Điểm bán</h4>
+                    <p class="text-yellow-900 text-sm leading-relaxed">
+                        Hãy <strong>in Mã nhân viên của bạn ra thẻ nhựa, Standee để bàn hoặc tạo mã QR</strong> đặt tại quầy. Khi khách hàng đến giao dịch (nạp thẻ, đăng ký gói...), hãy chủ động hướng dẫn và mời khách hàng thực hiện thao tác nhập mã này để hệ thống ghi nhận chính xác doanh thu và nỗ lực chăm sóc khách hàng của bạn!
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="bg-gray-800 text-gray-400 text-center py-4 text-xs">
+            <p>&copy; Tài liệu Hướng dẫn - Kênh Phân Phối</p>
+        </div>
+
+    </div>
+
+</body>
+</html>
