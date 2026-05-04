@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hướng Dẫn Nhập Mã HRM Cho Điểm Ủy Quyền</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -43,9 +44,12 @@
     </style>
 </head>
 <body class="flex justify-center py-4 md:py-10">
+    <button id="exportPdfBtn" class="fixed top-4 right-4 z-50 bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded-lg shadow-lg transition-colors duration-200">
+        <i class="fas fa-file-pdf mr-2"></i>Xuất PDF
+    </button>
 
     <!-- Container Infographic -->
-    <div class="max-w-4xl w-full bg-white shadow-2xl rounded-2xl md:rounded-3xl overflow-hidden border border-gray-100">
+    <div id="pdfContent" class="max-w-4xl w-full bg-white shadow-2xl rounded-2xl md:rounded-3xl overflow-hidden border border-gray-100">
         
         <!-- Header Section -->
         <div class="bg-gradient-to-br from-blue-700 via-blue-600 to-blue-500 p-8 md:p-12 text-center text-white relative overflow-hidden">
@@ -69,7 +73,7 @@
         <!-- Section Hướng dẫn (Có Mockup) -->
         <div class="p-6 md:p-10 bg-gray-50">
             <h2 class="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-10">
-                <i class="fas fa-tasks text-blue-500 mr-2"></i> 4 Bước Khách Hàng Thực Hiện
+                <i class="fas fa-tasks text-blue-500 mr-2"></i> 4 Bước Thực Hiện Trên Ứng Dụng My VNPT
             </h2>
 
             <div class="space-y-8">
@@ -167,7 +171,7 @@
                         <!-- Text -->
                         <div>
                             <h3 class="text-xl font-bold text-blue-900 mb-3 flex items-center">
-                                Nhập Mã Nhân Viên <span class="ml-2 bg-red-100 text-red-600 text-[10px] uppercase px-2 py-1 rounded font-bold tracking-wider">Quan trọng</span>
+                                Nhập Mã Nhân Viên<span class="ml-2 bg-red-100 text-red-600 text-[10px] uppercase px-2 py-1 rounded font-bold tracking-wider">Quan trọng</span>
                             </h3>
                             <p class="text-gray-700 mb-3">Màn hình nhập liệu hiện ra, yêu cầu điền:</p>
                             <ul class="list-none space-y-2 mb-4">
@@ -269,5 +273,32 @@
 
     </div>
 
+    <script>
+        const exportPdfBtn = document.getElementById('exportPdfBtn');
+        const pdfContent = document.getElementById('pdfContent');
+
+        exportPdfBtn.addEventListener('click', () => {
+            const originalText = exportPdfBtn.innerHTML;
+            exportPdfBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Đang xuất...';
+            exportPdfBtn.disabled = true;
+
+            const options = {
+                margin: 8,
+                filename: 'Huong-dan-nhap-ma-nhan-vien.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf()
+                .set(options)
+                .from(pdfContent)
+                .save()
+                .finally(() => {
+                    exportPdfBtn.innerHTML = originalText;
+                    exportPdfBtn.disabled = false;
+                });
+        });
+    </script>
 </body>
 </html>
